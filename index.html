@@ -5,7 +5,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="light dark" />
+  <meta name="description"
+    content="Apresentação interativa sobre Engenharia de Prompt — como conversar com a Inteligência Artificial para obter respostas úteis." />
   <title>Engenharia de Prompt — Apresentação da Oficina</title>
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -15,12 +19,6 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    function withOpacity(variable) {
-      return function (ctx) {
-        if (ctx.opacityValue === undefined) return "rgb(var(" + variable + "))";
-        return "rgb(var(" + variable + ") / " + ctx.opacityValue + ")";
-      };
-    }
     tailwind.config = {
       darkMode: "class",
       theme: {
@@ -29,7 +27,7 @@
             paper: "var(--c-bg)",
             surface: "var(--c-surface)",
             line: "var(--c-line)",
-            ink: withOpacity("--c-ink-rgb"),
+            ink: "rgb(var(--c-ink-rgb) / <alpha-value>)",
             brand: { light: "#EDEBF7", DEFAULT: "#4B3F72", deep: "#332953", glow: "#C9C2E8" },
             gold: { light: "#FBF3D9", DEFAULT: "#C9A227", deep: "#8F711B", glow: "#E8C868" },
             signal: { light: "#E4F6F4", DEFAULT: "#1B998B", deep: "#136B61", glow: "#6FE0D2" },
@@ -46,589 +44,8 @@
     };
   </script>
 
-  <style>
-    :root {
-      --c-bg: #F8F8FB;
-      --c-surface: #FFFFFF;
-      --c-input: #FCFCFD;
-      --c-line: #E3E0EC;
-      --c-ink-rgb: 33 28 46;
-      --c-link: #4B3F72;
-    }
-
-    html.dark {
-      --c-bg: #14111E;
-      --c-surface: #1E1A2E;
-      --c-input: #241F38;
-      --c-line: rgba(255, 255, 255, .12);
-      --c-ink-rgb: 238 235 248;
-      --c-link: #C9C2E8;
-    }
-
-    html,
-    body {
-      height: 100%;
-    }
-
-    body {
-      overflow: hidden;
-      -webkit-font-smoothing: antialiased;
-      transition: background-color .25s ease, color .25s ease;
-    }
-
-    #deck {
-      position: relative;
-      width: 100%;
-      height: 100vh;
-      height: 100svh;
-      overflow: hidden;
-    }
-
-    .slide {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      transition: transform 0.6s cubic-bezier(0.65, 0, 0.35, 1);
-      will-change: transform;
-    }
-
-    .slide-inner {
-      height: 100%;
-      width: 100%;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .slide-inner::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    .slide-inner::-webkit-scrollbar-thumb {
-      background: #DAD6EA;
-      border-radius: 999px;
-    }
-
-    .slide-inner::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    .dark .slide-inner::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, .16);
-    }
-
-    .module-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      border-radius: 999px;
-      font-family: 'Inter', sans-serif;
-      font-weight: 600;
-      font-size: 0.8rem;
-      padding: 0.35rem 0.9rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .slide-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 600;
-      line-height: 1.08;
-      letter-spacing: -0.01em;
-      color: rgb(var(--c-ink-rgb));
-    }
-
-    .prompt-box {
-      border-radius: 0.9rem;
-      border: 1px solid;
-      overflow: hidden;
-      background: var(--c-surface);
-    }
-
-    .prompt-box-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem;
-      padding: 0.7rem 1rem;
-      font-family: 'Inter', sans-serif;
-      font-weight: 600;
-      font-size: 0.85rem;
-    }
-
-    .prompt-text {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.85rem;
-      line-height: 1.65;
-      color: rgb(var(--c-ink-rgb));
-      padding: 0.95rem 1.1rem 1.15rem;
-      white-space: pre-wrap;
-    }
-
-    .prompt-text.is-quoted::before {
-      content: "“ ";
-      opacity: .45;
-    }
-
-    .prompt-text.is-quoted::after {
-      content: " ”";
-      opacity: .45;
-    }
-
-    .copy-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      font-family: 'Inter', sans-serif;
-      font-size: 0.78rem;
-      font-weight: 600;
-      padding: 0.45rem 0.85rem;
-      border-radius: 999px;
-      border: 1px solid currentColor;
-      background: var(--c-surface);
-      white-space: nowrap;
-      transition: transform 0.15s ease, background 0.15s ease;
-      cursor: pointer;
-    }
-
-    .copy-btn:hover {
-      transform: translateY(-1px);
-    }
-
-    .copy-btn:active {
-      transform: translateY(0);
-    }
-
-    .copy-btn.copy-success {
-      background: #E7F6EC;
-      border-color: #1E7145;
-      color: #164F31 !important;
-    }
-
-    .copy-btn.copy-fail {
-      background: #FBEAE8;
-      border-color: #C0392B;
-      color: #8E291D !important;
-    }
-
-    .reveal-btn {
-      display: inline-block;
-      font-family: 'Inter', sans-serif;
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--c-link);
-      text-decoration: underline;
-      text-underline-offset: 3px;
-      text-decoration-color: #C7C1E0;
-      cursor: pointer;
-      background: none;
-      border: none;
-      padding: 0.3rem 0;
-    }
-
-    .reveal-btn:hover {
-      text-decoration-color: var(--c-link);
-    }
-
-    .dark .reveal-btn {
-      text-decoration-color: rgba(201, 194, 232, .45);
-    }
-
-    .reveal-panel {
-      border-radius: 0.75rem;
-      background: var(--c-bg);
-      border: 1px dashed var(--c-line);
-      padding: 0.85rem 1rem;
-      font-size: 0.85rem;
-      line-height: 1.6;
-      color: rgb(var(--c-ink-rgb) / .82);
-      margin-top: 0.6rem;
-      white-space: pre-wrap;
-    }
-
-    .reveal-panel.hidden {
-      display: none;
-    }
-
-    .nav-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-family: 'Inter', sans-serif;
-      font-weight: 600;
-      font-size: 0.85rem;
-      color: rgb(var(--c-ink-rgb));
-      background: var(--c-surface);
-      border: 1px solid var(--c-line);
-      border-radius: 999px;
-      padding: 0.6rem 1.15rem;
-      box-shadow: 0 1px 2px rgba(33, 28, 46, 0.05);
-      transition: border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
-      cursor: pointer;
-    }
-
-    .nav-btn:hover:not(:disabled) {
-      border-color: #4B3F72;
-      color: #4B3F72;
-      transform: translateY(-1px);
-    }
-
-    .nav-btn:disabled {
-      opacity: 0.32;
-      cursor: not-allowed;
-    }
-
-    .dark .nav-btn {
-      box-shadow: none;
-    }
-
-    .dark .nav-btn:hover:not(:disabled) {
-      border-color: #A79CC9;
-      color: #C9C2E8;
-    }
-
-    .theme-toggle {
-      position: fixed;
-      top: 1rem;
-      right: 1rem;
-      z-index: 50;
-      width: 2.75rem;
-      height: 2.75rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 999px;
-      background: var(--c-surface);
-      border: 1px solid var(--c-line);
-      color: rgb(var(--c-ink-rgb));
-      box-shadow: 0 1px 2px rgba(33, 28, 46, 0.05);
-      cursor: pointer;
-      transition: transform .15s ease, border-color .15s ease;
-    }
-
-    .theme-toggle:hover {
-      transform: translateY(-1px);
-      border-color: #4B3F72;
-    }
-
-    .dark .theme-toggle {
-      box-shadow: none;
-    }
-
-    .dark .theme-toggle:hover {
-      border-color: #A79CC9;
-    }
-
-    @media (min-width: 640px) {
-      .theme-toggle {
-        top: 1.15rem;
-        right: 1.5rem;
-      }
-    }
-
-    .filter-btn {
-      font-family: 'Inter', sans-serif;
-      font-weight: 600;
-      font-size: 0.85rem;
-      padding: 0.55rem 1.1rem;
-      border-radius: 999px;
-      border: 1px solid var(--c-line);
-      background: var(--c-surface);
-      color: rgb(var(--c-ink-rgb) / .62);
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .filter-btn.is-active {
-      background: #4B3F72;
-      border-color: #4B3F72;
-      color: #fff;
-    }
-
-    .tool-card {
-      border-radius: 0.9rem;
-      border: 1px solid var(--c-line);
-      background: var(--c-surface);
-      padding: 1.1rem 1.25rem;
-    }
-
-    .timer-display {
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-      letter-spacing: -0.02em;
-    }
-
-    #timerDisplay.timer-urgent {
-      color: #C0392B !important;
-    }
-
-    .dark #timerDisplay.timer-urgent {
-      color: #F3A79D !important;
-    }
-
-    .timer-track {
-      width: 100%;
-      height: 8px;
-      background: var(--c-line);
-      border-radius: 999px;
-      overflow: hidden;
-    }
-
-    .timer-fill {
-      height: 100%;
-      transition: width 1s linear, background 0.3s ease;
-      width: 100%;
-      background: linear-gradient(90deg, #C9A227, #4B3F72);
-    }
-
-    .dark .timer-fill {
-      background: linear-gradient(90deg, #E8C868, #8F7FC9);
-    }
-
-    .timer-fill.is-urgent {
-      background: linear-gradient(90deg, #C0392B, #C9A227) !important;
-    }
-
-    .dark .timer-fill.is-urgent {
-      background: linear-gradient(90deg, #F3A79D, #E8C868) !important;
-    }
-
-    .timer-ctrl {
-      font-family: 'Inter', sans-serif;
-      font-weight: 600;
-      font-size: 0.85rem;
-      border-radius: 999px;
-      padding: 0.55rem 1.2rem;
-      cursor: pointer;
-      border: 1px solid transparent;
-      transition: transform 0.15s ease, opacity 0.15s ease;
-    }
-
-    .timer-ctrl:hover {
-      transform: translateY(-1px);
-    }
-
-    .timer-ctrl:active {
-      transform: translateY(0);
-    }
-
-    .timer-ctrl:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .timer-preset {
-      font-family: 'Inter', sans-serif;
-      font-size: 0.78rem;
-      font-weight: 600;
-      padding: 0.4rem 0.85rem;
-      border-radius: 999px;
-      border: 1px solid var(--c-line);
-      background: var(--c-surface);
-      color: rgb(var(--c-ink-rgb) / .62);
-      cursor: pointer;
-    }
-
-    .timer-preset.is-active {
-      background: #332953;
-      border-color: #332953;
-      color: #fff;
-    }
-
-    .builder-style-input {
-      width: 100%;
-      font-family: 'Inter', sans-serif;
-      font-size: 0.88rem;
-      padding: 0.6rem 0.8rem;
-      border-radius: 0.65rem;
-      border: 1px solid var(--c-line);
-      background: var(--c-input);
-      color: rgb(var(--c-ink-rgb));
-      outline: none;
-      transition: border-color 0.15s ease, background 0.15s ease;
-    }
-
-    .builder-style-input:focus {
-      border-color: #4B3F72;
-      background: var(--c-surface);
-    }
-
-    .dark .builder-style-input:focus {
-      border-color: #8F80C9;
-    }
-
-    .builder-style-input::placeholder {
-      color: rgb(var(--c-ink-rgb) / .35);
-    }
-
-    .score-row {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      border: 1px solid var(--c-line);
-      border-radius: 0.7rem;
-      padding: 0.5rem 0.6rem;
-      background: var(--c-bg);
-    }
-
-    .score-rank {
-      width: 1.6rem;
-      height: 1.6rem;
-      border-radius: 999px;
-      flex-shrink: 0;
-      background: var(--c-surface);
-      border: 1px solid var(--c-line);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.7rem;
-      font-weight: 700;
-      color: rgb(var(--c-ink-rgb) / .6);
-    }
-
-    .score-name {
-      flex: 1;
-      min-width: 0;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: rgb(var(--c-ink-rgb));
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .score-value {
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700;
-      font-size: 1.05rem;
-      color: var(--c-link);
-      min-width: 1.5rem;
-      text-align: center;
-      flex-shrink: 0;
-    }
-
-    .score-btn {
-      width: 1.75rem;
-      height: 1.75rem;
-      border-radius: 999px;
-      flex-shrink: 0;
-      border: 1px solid var(--c-line);
-      background: var(--c-surface);
-      color: rgb(var(--c-ink-rgb));
-      font-size: 0.9rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: transform .15s ease;
-    }
-
-    .score-btn:hover {
-      transform: translateY(-1px);
-    }
-
-    .score-remove {
-      color: #C0392B;
-    }
-
-    .dark .score-remove {
-      color: #F3A79D;
-    }
-
-    .builder-field label {
-      font-family: 'Inter', sans-serif;
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: var(--c-link);
-      display: block;
-      margin-bottom: 0.3rem;
-    }
-
-    .builder-field input {
-      width: 100%;
-      font-family: 'Inter', sans-serif;
-      font-size: 0.88rem;
-      padding: 0.6rem 0.8rem;
-      border-radius: 0.65rem;
-      border: 1px solid var(--c-line);
-      background: var(--c-input);
-      color: rgb(var(--c-ink-rgb));
-      outline: none;
-      transition: border-color 0.15s ease, background 0.15s ease;
-    }
-
-    .builder-field input:focus {
-      border-color: #4B3F72;
-      background: var(--c-surface);
-    }
-
-    .dark .builder-field input:focus {
-      border-color: #8F80C9;
-    }
-
-    .builder-field input::placeholder {
-      color: rgb(var(--c-ink-rgb) / .35);
-    }
-
-    .cursor-blink {
-      display: inline-block;
-      animation: blink 1s step-start infinite;
-    }
-
-    @keyframes blink {
-      50% {
-        opacity: 0;
-      }
-    }
-
-    .intro-rise {
-      animation: introRise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
-    }
-
-    @keyframes introRise {
-      from {
-        opacity: 0;
-        transform: translateY(18px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    :focus-visible {
-      outline: 2.5px solid #C9A227;
-      outline-offset: 2px;
-      border-radius: 4px;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .slide {
-        transition: none !important;
-      }
-
-      .cursor-blink {
-        animation: none !important;
-      }
-
-      .intro-rise {
-        animation: none !important;
-        opacity: 1 !important;
-        transform: none !important;
-      }
-
-      .timer-fill {
-        transition: none !important;
-      }
-
-      body {
-        transition: none !important;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
+  <script src="app.js" defer></script>
 </head>
 
 <body class="font-body text-ink bg-paper">
@@ -647,1154 +64,824 @@
     </svg>
   </button>
 
-  <div id="deck">
+  <main>
+    <div id="deck">
 
-    <!-- ============================================================ -->
-    <!-- SLIDE 0 — CAPA -->
-    <!-- ============================================================ -->
-    <section class="slide" data-index="0">
-      <div class="slide-inner flex flex-col items-center justify-center px-6 sm:px-12 text-center">
-        <div class="max-w-3xl mx-auto intro-rise">
-          <div
-            class="mb-8 flex items-center justify-center gap-2 font-mono text-sm sm:text-base text-brand/70 dark:text-brand-glow">
-            <span>&gt;</span>
-            <span id="coverTyped"></span><span class="cursor-blink">▌</span>
-          </div>
-          <h1 class="slide-title text-4xl sm:text-6xl mb-5">Engenharia de Prompt</h1>
-          <p class="text-lg sm:text-xl text-ink/70 max-w-xl mx-auto mb-10 leading-relaxed">
-            Como conversar com a Inteligência Artificial para obter respostas realmente úteis — do zero à prática.
-          </p>
-          <div class="flex flex-wrap items-center justify-center gap-3 mb-9">
-            <span class="rounded-full bg-brand-light text-brand font-semibold text-sm px-4 py-1.5">Sem experiência
-              técnica necessária</span>
-          </div>
-
-          <div class="inline-flex flex-col items-center gap-2">
-            <div class="rounded-2xl p-3" style="background:#FFFFFF; box-shadow:0 1px 2px rgba(33,28,46,0.08);">
-              <img
-                src="data:image/png;base64,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"
-                alt="QR code para acessar esta apresentação em oficina-ia-gamma.vercel.app" width="118" height="118"
-                class="block rounded-md" />
+      <!-- ============================================================ -->
+      <!-- SLIDE 0 — CAPA                                               -->
+      <!-- ============================================================ -->
+      <section class="slide" data-index="0" role="group" aria-roledescription="slide" aria-label="Slide 1 de 17 — Capa">
+        <div class="slide-inner flex flex-col items-center justify-center px-6 sm:px-12 text-center">
+          <div class="max-w-3xl mx-auto intro-rise">
+            <div
+              class="mb-8 flex items-center justify-center gap-2 font-mono text-sm sm:text-base text-brand/70 dark:text-brand-glow">
+              <span>&gt;</span>
+              <span id="coverTyped"></span><span class="cursor-blink">▌</span>
             </div>
-            <p class="text-xs text-ink/55">Acesse pelo celular</p>
-            <p class="text-xs font-mono text-ink/45">oficina-ia-gamma.vercel.app</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 1 — AGENDA -->
-    <!-- ============================================================ -->
-    <section class="slide" data-index="1">
-      <div class="slide-inner flex flex-col justify-center px-6 py-16 sm:px-14 md:px-24">
-        <div class="max-w-4xl mx-auto w-full">
-          <span class="module-tag bg-brand-light text-brand">Roteiro do encontro</span>
-          <h2 class="slide-title text-3xl sm:text-5xl mb-10">Como vamos entender sobre IA</h2>
-
-          <div class="space-y-4">
-            <div class="flex gap-4">
-              <div
-                class="w-9 h-9 shrink-0 rounded-full bg-brand-light text-brand font-display font-semibold flex items-center justify-center text-sm">
-                1</div>
-              <div>
-                <p class="font-semibold text-ink mb-0.5">Abertura</p>
-                <p class="text-sm text-ink/60">Boas-vindas e alinhamento do que vamos alcançar juntos.</p>
-              </div>
-            </div>
-            <div class="flex gap-4">
-              <div
-                class="w-9 h-9 shrink-0 rounded-full bg-brand-light text-brand font-display font-semibold flex items-center justify-center text-sm">
-                2</div>
-              <div>
-                <p class="font-semibold text-ink mb-0.5">A Base</p>
-                <p class="text-sm text-ink/60">De onde veio a IA e por que ela não tem nada de ficção científica.</p>
-              </div>
-            </div>
-            <div class="flex gap-4">
-              <div
-                class="w-9 h-9 shrink-0 rounded-full bg-signal-light text-signal-deep font-display font-semibold flex items-center justify-center text-sm">
-                3</div>
-              <div>
-                <p class="font-semibold text-ink mb-0.5">O Ecossistema</p>
-                <p class="text-sm text-ink/60">Qual ferramenta escolher para cada tipo de tarefa do seu dia a dia.</p>
-              </div>
-            </div>
-            <div class="flex gap-4">
-              <div
-                class="w-9 h-9 shrink-0 rounded-full bg-warn-light text-warn-deep font-display font-semibold flex items-center justify-center text-sm">
-                4</div>
-              <div>
-                <p class="font-semibold text-ink mb-0.5">O Contraste</p>
-                <p class="text-sm text-ink/60">Prompt fraco vs. prompt excelente, lado a lado, na prática.</p>
-              </div>
-            </div>
-            <div class="flex gap-4">
-              <div
-                class="w-9 h-9 shrink-0 rounded-full bg-gold-light text-gold-deep font-display font-semibold flex items-center justify-center text-sm">
-                5</div>
-              <div>
-                <p class="font-semibold text-ink mb-0.5">Mão na Massa</p>
-                <p class="text-sm text-ink/60">Construção guiada do seu próprio prompt, para uma tarefa real sua.</p>
-              </div>
-            </div>
-            <div class="flex gap-4">
-              <div
-                class="w-9 h-9 shrink-0 rounded-full bg-good-light text-good-deep font-display font-semibold flex items-center justify-center text-sm">
-                6</div>
-              <div>
-                <p class="font-semibold text-ink mb-0.5">O Souvenir Digital</p>
-                <p class="text-sm text-ink/60">Um material pronto, gerado por IA, para você levar consigo.</p>
-              </div>
-            </div>
-            <div class="flex gap-4">
-              <div
-                class="w-9 h-9 shrink-0 rounded-full bg-brand-light text-brand font-display font-semibold flex items-center justify-center text-sm">
-                7</div>
-              <div>
-                <p class="font-semibold text-ink mb-0.5">Fechamento</p>
-                <p class="text-sm text-ink/60">Recapitulação do que aprendemos e espaço para perguntas.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 2 — MÓDULO 1 — A BASE -->
-    <!-- ============================================================ -->
-    <section class="slide" data-index="2">
-      <div class="slide-inner flex flex-col justify-center px-6 py-20 sm:px-14 md:px-24">
-        <div class="max-w-4xl mx-auto w-full">
-          <span class="module-tag bg-brand-light text-brand">Módulo 1 · A Base</span>
-          <h2 class="slide-title text-3xl sm:text-5xl mb-8">A IA não nasceu ontem</h2>
-
-          <ul class="space-y-4 text-base sm:text-lg text-ink/80 leading-relaxed mb-10">
-            <li class="flex gap-3"><span class="text-gold dark:text-gold-glow font-bold shrink-0">1950</span> Alan
-              Turing pergunta: "uma máquina pode pensar?" — nasce a questão que funda o campo.</li>
-            <li class="flex gap-3"><span class="text-gold dark:text-gold-glow font-bold shrink-0">1956</span> A
-              conferência de Dartmouth batiza oficialmente o termo Inteligência Artificial.</li>
-            <li class="flex gap-3"><span class="text-gold dark:text-gold-glow font-bold shrink-0">Décadas</span>
-              seguintes trazem os chamados "invernos da IA": muita promessa, pouca entrega.</li>
-            <li class="flex gap-3"><span class="text-gold dark:text-gold-glow font-bold shrink-0">2012+</span>
-              Computadores potentes, dados em abundância e redes neurais se encontram — começa o salto atual.</li>
-            <li class="flex gap-3"><span class="text-gold dark:text-gold-glow font-bold shrink-0">2022</span> O ChatGPT
-              chega ao público geral: a IA generativa sai dos laboratórios e vai parar no celular de qualquer pessoa — é
-              o momento em que uma habilidade como a de hoje passa a importar para todo mundo.</li>
-          </ul>
-
-          <div class="rounded-2xl border border-line bg-surface px-6 py-6 sm:px-8 sm:py-7">
-            <p class="font-display text-2xl sm:text-3xl text-brand-deep dark:text-brand-glow leading-snug">
-              "Ela não pensa. Ela prevê padrões."
+            <h1 class="slide-title text-4xl sm:text-6xl mb-5">Engenharia de Prompt</h1>
+            <p class="text-lg sm:text-xl text-ink/70 max-w-xl mx-auto mb-10 leading-relaxed">
+              Como conversar com a Inteligência Artificial para obter respostas realmente úteis — do zero à prática.
             </p>
-            <p class="text-sm text-ink/60 mt-2">Uma IA generativa funciona prevendo, palavra por palavra, a sequência
-              mais provável — como um corretor automático extremamente sofisticado.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-
-    <!-- ============================================================ -->
-    <!-- SLIDE — USO RESPONSÁVEL (ÉTICA) -->
-    <!-- ============================================================ -->
-    <section class="slide" data-index="3">
-      <div class="slide-inner flex flex-col justify-center px-6 py-16 sm:px-14 md:px-24">
-        <div class="max-w-4xl mx-auto w-full">
-          <span class="module-tag bg-warn-light text-warn-deep">Uso responsável</span>
-          <h2 class="slide-title text-3xl sm:text-5xl mb-6">Até onde posso usar IA na escola?</h2>
-          <p class="text-base sm:text-lg text-ink/70 leading-relaxed mb-8 max-w-2xl">
-            Não existe uma resposta única, mas existe uma linha bem clara entre usar a IA como apoio e usar a IA no seu
-            lugar.
-          </p>
-
-          <div class="grid sm:grid-cols-2 gap-5 mb-6">
-            <div class="rounded-2xl border border-good/30 bg-good-light px-6 py-6">
-              <p class="font-semibold text-good-deep mb-2">Ajuda genuína</p>
-              <ul class="text-sm text-ink/70 space-y-1.5 list-disc pl-4">
-                <li>Entender um conceito que não ficou claro</li>
-                <li>Revisar gramática e clareza do que você mesmo escreveu</li>
-                <li>Gerar ideias para começar um trabalho</li>
-                <li>Simular perguntas para estudar</li>
-              </ul>
+            <div class="flex flex-wrap items-center justify-center gap-3 mb-9">
+              <span class="rounded-full bg-brand-light dark:bg-brand-deep/25 text-brand font-semibold text-sm px-4 pt-1 pb-32.5">Sem experiência
+                técnica necessária</span>
             </div>
-            <div class="rounded-2xl border border-warn/30 bg-warn-light px-6 py-6">
-              <p class="font-semibold text-warn-deep mb-2">Território arriscado</p>
-              <ul class="text-sm text-ink/70 space-y-1.5 list-disc pl-4">
-                <li>Copiar e entregar um texto pronto como se fosse seu</li>
-                <li>Deixar a IA decidir sem entender o resultado</li>
-                <li>Compartilhar dados pessoais seus ou de outras pessoas</li>
-                <li>Usar em provas ou avaliações sem autorização</li>
-              </ul>
-            </div>
-          </div>
 
-          <div class="rounded-xl border border-line bg-surface px-5 py-4">
-            <p class="text-sm text-ink/70"><span class="font-semibold text-ink">Regra de ouro:</span> se você não
-              conseguiria explicar o que a IA escreveu, é sinal de que usou rápido demais.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE — EXEMPLO DE ALUCINAÇÃO -->
-    <!-- ============================================================ -->
-    <section class="slide" data-index="4">
-      <div class="slide-inner flex flex-col justify-center px-6 py-16 sm:px-14 md:px-24">
-        <div class="max-w-4xl mx-auto w-full">
-          <span class="module-tag bg-warn-light text-warn-deep">Uso responsável</span>
-          <h2 class="slide-title text-3xl sm:text-5xl mb-6">Quando a IA erra com toda a confiança</h2>
-          <p class="text-base sm:text-lg text-ink/70 leading-relaxed mb-8 max-w-2xl">
-            Isso se chama <span class="font-semibold text-ink">alucinação</span>: a IA inventa uma informação falsa e
-            apresenta com a mesma segurança de uma resposta correta.
-          </p>
-
-          <div class="prompt-box border-warn/40 mb-6">
-            <div class="prompt-box-head bg-warn-light text-warn-deep">
-              <span>Prompt</span>
-            </div>
-            <p class="prompt-text is-quoted">Qual é a origem exata da palavra "aplicativo" no português do Brasil? Cite
-              a fonte.</p>
-            <div class="px-4 pb-4">
-              <button class="reveal-btn" data-reveal="r-halluc" aria-expanded="false">Ver resposta simulada</button>
-              <div id="r-halluc" class="reveal-panel hidden">A palavra "aplicativo" foi registrada pela primeira vez em
-                1987, segundo o Dicionário Brasileiro de Neologismos Digitais (2ª edição, p. 47), como adaptação direta
-                do inglês "application".</div>
-            </div>
-          </div>
-
-          <div class="rounded-xl border border-line bg-surface px-5 py-4">
-            <p class="text-sm text-ink/70"><span class="font-semibold text-warn-deep">Checagem rápida:</span> esse
-              dicionário não existe — a IA inventou uma fonte que parece completamente real. Por isso vale sempre checar
-              números, datas e citações antes de confiar.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE — INTERVALO / HUMOR -->
-    <!-- ============================================================ -->
-    <section class="slide" data-index="5">
-      <div class="slide-inner flex flex-col justify-center px-6 py-16 sm:px-14 md:px-24">
-        <div class="max-w-4xl mx-auto w-full">
-          <span class="module-tag bg-signal-light text-signal-deep">Intervalo</span>
-          <h2 class="slide-title text-3xl sm:text-5xl mb-6">Hora de rir um pouco</h2>
-          <p class="text-base sm:text-lg text-ink/70 leading-relaxed mb-8 max-w-2xl">
-            A IA também serve para descontrair. Copie o prompt abaixo e peça para ela criar algo engraçado sobre o que
-            acabamos de aprender.
-          </p>
-
-          <div class="prompt-box border-signal/40">
-            <div class="prompt-box-head bg-signal-light text-signal-deep">
-              <span>Prompt</span>
-              <button class="copy-btn text-signal-deep dark:text-signal-glow" data-target="p-humor">Copiar</button>
-            </div>
-            <p id="p-humor" class="prompt-text is-quoted">Crie uma piada curta e engraçada sobre uma pessoa que confiou
-              cegamente numa informação inventada por uma IA e se deu mal.</p>
-            <div class="px-4 pb-4">
-              <button class="reveal-btn" data-reveal="r-humor" aria-expanded="false">Ver resposta simulada</button>
-              <div id="r-humor" class="reveal-panel hidden">— Por que o aluno tirou zero no trabalho sobre dinossauros?
-                — Porque confiou na IA quando ela disse que o Tiranossauro Rex tinha inventado o brigadeiro.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <!-- ============================================================ -->
-    <!-- SLIDE 3 — MÓDULO 2 — ECOSSISTEMA -->
-    <!-- ============================================================ -->
-    <section class="slide" data-index="6">
-      <div class="slide-inner flex flex-col justify-center px-6 py-20 sm:px-14 md:px-24">
-        <div class="max-w-5xl mx-auto w-full">
-          <span class="module-tag bg-signal-light text-signal-deep">Módulo 2 · O Ecossistema</span>
-          <h2 class="slide-title text-3xl sm:text-5xl mb-8">Qual ferramenta usar em cada situação</h2>
-
-          <div class="flex flex-wrap gap-3 mb-6" id="toolFilters">
-            <button class="filter-btn is-active" data-filter="texto">Para pensar e escrever</button>
-            <button class="filter-btn" data-filter="imagem">Para criar imagens</button>
-          </div>
-
-          <div class="grid sm:grid-cols-3 gap-4 mb-8" id="toolGrid">
-            <div class="tool-card" data-cat="texto">
-              <p class="font-display font-semibold text-lg mb-1">ChatGPT</p>
-              <p class="text-xs text-ink/55 mb-3 font-mono">OpenAI</p>
-              <p class="text-sm text-ink/70 leading-relaxed">Uso geral, redação, brainstorm e o maior ecossistema de
-                plugins.</p>
-            </div>
-            <div class="tool-card" data-cat="texto">
-              <p class="font-display font-semibold text-lg mb-1">Claude</p>
-              <p class="text-xs text-ink/55 mb-3 font-mono">Anthropic</p>
-              <p class="text-sm text-ink/70 leading-relaxed">Textos longos, análise cuidadosa de documentos e escrita
-                com tom natural.</p>
-            </div>
-            <div class="tool-card" data-cat="texto">
-              <p class="font-display font-semibold text-lg mb-1">Gemini</p>
-              <p class="text-xs text-ink/55 mb-3 font-mono">Google</p>
-              <p class="text-sm text-ink/70 leading-relaxed">Ideal para quem já vive dentro do Gmail, Docs e Agenda do
-                Google.</p>
-            </div>
-            <div class="tool-card" data-cat="imagem" style="display:none;">
-              <p class="font-display font-semibold text-lg mb-1">Midjourney</p>
-              <p class="text-xs text-ink/55 mb-3 font-mono">Independente</p>
-              <p class="text-sm text-ink/70 leading-relaxed">Ilustrações e artes com forte qualidade estética a partir
-                de uma descrição.</p>
-            </div>
-            <div class="tool-card" data-cat="imagem" style="display:none;">
-              <p class="font-display font-semibold text-lg mb-1">DALL-E</p>
-              <p class="text-xs text-ink/55 mb-3 font-mono">Dentro do ChatGPT</p>
-              <p class="text-sm text-ink/70 leading-relaxed">Gera imagens sem sair da própria conversa que você já está
-                tendo.</p>
-            </div>
-            <div class="tool-card" data-cat="imagem" style="display:none;">
-              <p class="font-display font-semibold text-lg mb-1">Gemini / ImageFX</p>
-              <p class="text-xs text-ink/55 mb-3 font-mono">Google</p>
-              <p class="text-sm text-ink/70 leading-relaxed">Opção gratuita e já integrada ao ecossistema Google.</p>
-            </div>
-          </div>
-
-          <p class="text-sm sm:text-base text-ink/65 border-l-2 border-signal pl-4 mb-2">
-            Regra prática: precisa pensar, escrever ou organizar algo? Ferramenta de texto. Precisa de uma imagem que
-            ainda não existe? Ferramenta de imagem.
-          </p>
-          <p class="text-sm text-ink/50 pl-4">Dica: todas têm um plano gratuito — dá para testar antes de decidir qual
-            vale assinar.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 4 — MÓDULO 3 — INTRO -->
-    <!-- ============================================================ -->
-    <section class="slide" data-index="7">
-      <div class="slide-inner flex flex-col justify-center px-6 py-20 sm:px-14 md:px-24">
-        <div class="max-w-4xl mx-auto w-full">
-          <span class="module-tag bg-warn-light text-warn-deep">Módulo 3 · O Contraste</span>
-          <h2 class="slide-title text-3xl sm:text-5xl mb-6">Lixo entra, lixo sai</h2>
-          <p class="text-base sm:text-lg text-ink/70 leading-relaxed mb-4 max-w-2xl">
-            A IA é como um estagiário genial que não lê pensamento — ela só sabe exatamente o que você disser a ela. Um
-            comando vago devolve uma resposta vaga. Um comando específico devolve uma resposta específica e útil.
-          </p>
-          <p class="text-base sm:text-lg text-ink/70 leading-relaxed mb-10 max-w-2xl">
-            É por isso que duas pessoas usando a mesma ferramenta podem ter experiências completamente diferentes: a
-            diferença nunca está na IA, está no comando.
-          </p>
-
-          <div class="grid sm:grid-cols-2 gap-5">
-            <div class="rounded-2xl border border-warn/30 bg-warn-light px-6 py-6">
-              <p class="font-semibold text-warn-deep mb-1">Prompt vago</p>
-              <p class="text-sm text-ink/70">→ resposta genérica, que serve para qualquer pessoa e não resolve nada de
-                verdade.</p>
-            </div>
-            <div class="rounded-2xl border border-good/30 bg-good-light px-6 py-6">
-              <p class="font-semibold text-good-deep mb-1">Prompt específico</p>
-              <p class="text-sm text-ink/70">→ resposta pronta para usar, no tom certo, com o contexto certo.</p>
-            </div>
-          </div>
-
-          <p class="text-sm text-ink/50 mt-8">A seguir, dois exemplos reais lado a lado.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 5 — MÓDULO 3 — PAR 1 (E-MAIL) -->
-    <!-- ============================================================ -->
-    <section class="slide" data-index="8">
-      <div class="slide-inner flex flex-col justify-center px-6 py-16 sm:px-14 md:px-24">
-        <div class="max-w-4xl mx-auto w-full">
-          <span class="module-tag bg-warn-light text-warn-deep">Módulo 3 · O Contraste</span>
-          <h2 class="slide-title text-2xl sm:text-4xl mb-8">Antes e depois: pedir um dia de folga</h2>
-
-          <div class="space-y-5">
-            <div class="prompt-box border-warn/40">
-              <div class="prompt-box-head bg-warn-light text-warn-deep">
-                <span>✗ Prompt genérico</span>
-                <button class="copy-btn text-warn-deep dark:text-warn-glow" data-target="p1-ruim">Copiar</button>
+            <div class="inline-flex flex-col items-center gap-2">
+              <div class="qr-box rounded-2xl p-3">
+                <img src="qrcode.png" alt="QR code para acessar esta apresentação em oficina-ia-gamma.vercel.app"
+                  width="118" height="118" class="block rounded-md" />
               </div>
-              <p id="p1-ruim" class="prompt-text is-quoted">Escreva um email para meu chefe.</p>
+              <p class="text-xs text-ink/55">Acesse pelo celular</p>
+              <p class="text-xs font-mono text-ink/45">oficina-ia-gamma.vercel.app</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- SLIDE 1 — AGENDA                                             -->
+      <!-- ============================================================ -->
+      <section class="slide" data-index="1" role="group" aria-roledescription="slide"
+        aria-label="Slide 2 de 17 — Agenda">
+        <div class="slide-inner flex flex-col justify-center px-6 pt-16 pb-32 sm:px-14 md:px-24">
+          <div class="max-w-4xl mx-auto w-full">
+            <span class="module-tag bg-brand-light dark:bg-brand-deep/25 text-brand">Roteiro do encontro</span>
+            <h2 class="slide-title text-3xl sm:text-5xl mb-10">Como vamos entender sobre IA</h2>
+
+            <div class="space-y-4">
+              <div class="flex gap-4">
+                <div
+                  class="w-9 h-9 shrink-0 rounded-full bg-brand-light dark:bg-brand-deep/25 text-brand font-display font-semibold flex items-center justify-center text-sm">
+                  1</div>
+                <div>
+                  <p class="font-semibold text-ink mb-0.5">Abertura</p>
+                  <p class="text-sm text-ink/60">Boas-vindas e alinhamento do que vamos alcançar juntos.</p>
+                </div>
+              </div>
+              <div class="flex gap-4">
+                <div
+                  class="w-9 h-9 shrink-0 rounded-full bg-brand-light dark:bg-brand-deep/25 text-brand font-display font-semibold flex items-center justify-center text-sm">
+                  2</div>
+                <div>
+                  <p class="font-semibold text-ink mb-0.5">A Base</p>
+                  <p class="text-sm text-ink/60">De onde veio a IA e por que ela não tem nada de ficção científica.</p>
+                </div>
+              </div>
+              <div class="flex gap-4">
+                <div
+                  class="w-9 h-9 shrink-0 rounded-full bg-signal-light dark:bg-signal-deep/25 text-signal-deep dark:text-signal-glow font-display font-semibold flex items-center justify-center text-sm">
+                  3</div>
+                <div>
+                  <p class="font-semibold text-ink mb-0.5">O Ecossistema</p>
+                  <p class="text-sm text-ink/60">Qual ferramenta escolher para cada tipo de tarefa do seu dia a dia.</p>
+                </div>
+              </div>
+              <div class="flex gap-4">
+                <div
+                  class="w-9 h-9 shrink-0 rounded-full bg-warn-light dark:bg-warn-deep/25 text-warn-deep dark:text-warn-glow font-display font-semibold flex items-center justify-center text-sm">
+                  4</div>
+                <div>
+                  <p class="font-semibold text-ink mb-0.5">O Contraste</p>
+                  <p class="text-sm text-ink/60">Prompt fraco vs. prompt excelente, lado a lado, na prática.</p>
+                </div>
+              </div>
+              <div class="flex gap-4">
+                <div
+                  class="w-9 h-9 shrink-0 rounded-full bg-gold-light dark:bg-gold-deep/25 text-gold-deep dark:text-gold-glow font-display font-semibold flex items-center justify-center text-sm">
+                  5</div>
+                <div>
+                  <p class="font-semibold text-ink mb-0.5">Mão na Massa</p>
+                  <p class="text-sm text-ink/60">Construção guiada do seu próprio prompt, para uma tarefa real sua.</p>
+                </div>
+              </div>
+              <div class="flex gap-4">
+                <div
+                  class="w-9 h-9 shrink-0 rounded-full bg-good-light dark:bg-good-deep/25 text-good-deep dark:text-good-glow font-display font-semibold flex items-center justify-center text-sm">
+                  6</div>
+                <div>
+                  <p class="font-semibold text-ink mb-0.5">O Souvenir Digital</p>
+                  <p class="text-sm text-ink/60">Um material pronto, gerado por IA, para você levar consigo.</p>
+                </div>
+              </div>
+              <div class="flex gap-4">
+                <div
+                  class="w-9 h-9 shrink-0 rounded-full bg-brand-light dark:bg-brand-deep/25 text-brand font-display font-semibold flex items-center justify-center text-sm">
+                  7</div>
+                <div>
+                  <p class="font-semibold text-ink mb-0.5">Fechamento</p>
+                  <p class="text-sm text-ink/60">Recapitulação do que aprendemos e espaço para perguntas.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- SLIDE 2 — MÓDULO 1 · A BASE                                 -->
+      <!-- ============================================================ -->
+      <section class="slide" data-index="2" role="group" aria-roledescription="slide"
+        aria-label="Slide 3 de 17 — A Base">
+        <div class="slide-inner flex flex-col justify-center px-6 pt-20 pb-32 sm:px-14 md:px-24">
+          <div class="max-w-4xl mx-auto w-full">
+            <span class="module-tag bg-brand-light dark:bg-brand-deep/25 text-brand">Módulo 1 · A Base</span>
+            <h2 class="slide-title text-3xl sm:text-5xl mb-8">A IA não nasceu ontem</h2>
+
+            <ul class="space-y-4 text-base sm:text-lg text-ink/80 leading-relaxed mb-10">
+              <li class="flex gap-3"><span class="text-gold dark:text-gold-glow font-bold shrink-0">1950</span> Alan
+                Turing pergunta: "uma máquina pode pensar?" — nasce a questão que funda o campo.</li>
+              <li class="flex gap-3"><span class="text-gold dark:text-gold-glow font-bold shrink-0">1956</span> A
+                conferência de Dartmouth batiza oficialmente o termo Inteligência Artificial.</li>
+              <li class="flex gap-3"><span class="text-gold dark:text-gold-glow font-bold shrink-0">Décadas</span>
+                seguintes trazem os chamados "invernos da IA": muita promessa, pouca entrega.</li>
+              <li class="flex gap-3"><span class="text-gold dark:text-gold-glow font-bold shrink-0">2012+</span>
+                Computadores potentes, dados em abundância e redes neurais se encontram — começa o salto atual.</li>
+              <li class="flex gap-3"><span class="text-gold dark:text-gold-glow font-bold shrink-0">2022</span> O
+                ChatGPT
+                chega ao público geral: a IA generativa sai dos laboratórios e vai parar no celular de qualquer pessoa —
+                é
+                o momento em que uma habilidade como a de hoje passa a importar para todo mundo.</li>
+            </ul>
+
+            <div class="rounded-2xl border border-line bg-surface px-6 pt-6 pb-32 sm:px-8 sm:pt-7 pb-32">
+              <p class="font-display text-2xl sm:text-3xl text-brand-deep dark:text-brand-glow dark:text-brand-glow leading-snug">
+                "Ela não pensa. Ela prevê padrões."
+              </p>
+              <p class="text-sm text-ink/60 mt-2">Uma IA generativa funciona prevendo, palavra por palavra, a sequência
+                mais provável — como um corretor automático extremamente sofisticado.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- SLIDE 3 — USO RESPONSÁVEL (ÉTICA)                           -->
+      <!-- ============================================================ -->
+      <section class="slide" data-index="3" role="group" aria-roledescription="slide"
+        aria-label="Slide 4 de 17 — Uso Responsável">
+        <div class="slide-inner flex flex-col justify-center px-6 pt-16 pb-32 sm:px-14 md:px-24">
+          <div class="max-w-4xl mx-auto w-full">
+            <span class="module-tag bg-warn-light dark:bg-warn-deep/25 text-warn-deep dark:text-warn-glow">Uso responsável</span>
+            <h2 class="slide-title text-3xl sm:text-5xl mb-6">Até onde posso usar IA na escola?</h2>
+            <p class="text-base sm:text-lg text-ink/70 leading-relaxed mb-8 max-w-2xl">
+              Não existe uma resposta única, mas existe uma linha bem clara entre usar a IA como apoio e usar a IA no
+              seu
+              lugar.
+            </p>
+
+            <div class="grid sm:grid-cols-2 gap-5 mb-6">
+              <div class="rounded-2xl border border-good/30 dark:border-good-glow/20 bg-good-light dark:bg-good-deep/25 px-6 pt-6 pb-32">
+                <p class="font-semibold text-good-deep dark:text-good-glow mb-2">Ajuda genuína</p>
+                <ul class="text-sm text-ink/70 space-y-1.5 list-disc pl-4">
+                  <li>Entender um conceito que não ficou claro</li>
+                  <li>Revisar gramática e clareza do que você mesmo escreveu</li>
+                  <li>Gerar ideias para começar um trabalho</li>
+                  <li>Simular perguntas para estudar</li>
+                </ul>
+              </div>
+              <div class="rounded-2xl border border-warn/30 dark:border-warn-glow/20 bg-warn-light dark:bg-warn-deep/25 px-6 pt-6 pb-32">
+                <p class="font-semibold text-warn-deep dark:text-warn-glow mb-2">Território arriscado</p>
+                <ul class="text-sm text-ink/70 space-y-1.5 list-disc pl-4">
+                  <li>Copiar e entregar um texto pronto como se fosse seu</li>
+                  <li>Deixar a IA decidir sem entender o resultado</li>
+                  <li>Compartilhar dados pessoais seus ou de outras pessoas</li>
+                  <li>Usar em provas ou avaliações sem autorização</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="rounded-xl border border-line bg-surface px-5 pt-4 pb-32">
+              <p class="text-sm text-ink/70"><span class="font-semibold text-ink">Regra de ouro:</span> se você não
+                conseguiria explicar o que a IA escreveu, é sinal de que usou rápido demais.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- SLIDE 4 — EXEMPLO DE ALUCINAÇÃO                             -->
+      <!-- ============================================================ -->
+      <section class="slide" data-index="4" role="group" aria-roledescription="slide"
+        aria-label="Slide 5 de 17 — Alucinação">
+        <div class="slide-inner flex flex-col justify-center px-6 pt-16 pb-32 sm:px-14 md:px-24">
+          <div class="max-w-4xl mx-auto w-full">
+            <span class="module-tag bg-warn-light dark:bg-warn-deep/25 text-warn-deep dark:text-warn-glow">Uso responsável</span>
+            <h2 class="slide-title text-3xl sm:text-5xl mb-6">Quando a IA erra com toda a confiança</h2>
+            <p class="text-base sm:text-lg text-ink/70 leading-relaxed mb-8 max-w-2xl">
+              Isso se chama <span class="font-semibold text-ink">alucinação</span>: a IA inventa uma informação falsa e
+              apresenta com a mesma segurança de uma resposta correta.
+            </p>
+
+            <div class="prompt-box border-warn/40 mb-6">
+              <div class="prompt-box-head bg-warn-light dark:bg-warn-deep/25 text-warn-deep dark:text-warn-glow">
+                <span>Prompt</span>
+              </div>
+              <p class="prompt-text is-quoted">Qual é a origem exata da palavra "aplicativo" no português do Brasil?
+                Cite
+                a fonte.</p>
               <div class="px-4 pb-4">
-                <button class="reveal-btn" data-reveal="r1-ruim" aria-expanded="false">Ver resposta simulada</button>
-                <div id="r1-ruim" class="reveal-panel hidden">Prezado(a), espero que esteja bem. Escrevo para tratar de
-                  um assunto. Poderia me responder quando possível? Atenciosamente.</div>
+                <button class="reveal-btn" data-reveal="r-halluc" aria-expanded="false">Ver resposta
+                  simulada</button>
+                <div id="r-halluc" class="reveal-panel hidden">A palavra "aplicativo" foi registrada pela primeira vez
+                  em
+                  1987, segundo o Dicionário Brasileiro de Neologismos Digitais (2ª edição, p. 47), como adaptação
+                  direta
+                  do inglês "application".</div>
               </div>
+            </div>
+
+            <div class="rounded-xl border border-line bg-surface px-5 pt-4 pb-32">
+              <p class="text-sm text-ink/70"><span class="font-semibold text-warn-deep dark:text-warn-glow">Checagem rápida:</span> esse
+                dicionário não existe — a IA inventou uma fonte que parece completamente real. Por isso vale sempre
+                checar
+                números, datas e citações antes de confiar.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- SLIDE 5 — INTERVALO / HUMOR                                 -->
+      <!-- ============================================================ -->
+      <section class="slide" data-index="5" role="group" aria-roledescription="slide"
+        aria-label="Slide 6 de 17 — Intervalo">
+        <div class="slide-inner flex flex-col justify-center px-6 pt-16 pb-32 sm:px-14 md:px-24">
+          <div class="max-w-4xl mx-auto w-full">
+            <span class="module-tag bg-signal-light dark:bg-signal-deep/25 text-signal-deep dark:text-signal-glow">Intervalo</span>
+            <h2 class="slide-title text-3xl sm:text-5xl mb-6">Hora de rir um pouco</h2>
+            <p class="text-base sm:text-lg text-ink/70 leading-relaxed mb-8 max-w-2xl">
+              A IA também serve para descontrair. Copie o prompt abaixo e peça para ela criar algo engraçado sobre o que
+              acabamos de aprender.
+            </p>
+
+            <div class="prompt-box border-signal/40">
+              <div class="prompt-box-head bg-signal-light dark:bg-signal-deep/25 text-signal-deep dark:text-signal-glow">
+                <span>Prompt</span>
+                <button class="copy-btn text-signal-deep dark:text-signal-glow dark:text-signal-glow" data-target="p-humor"
+                  aria-label="Copiar prompt de humor">Copiar</button>
+              </div>
+              <p id="p-humor" class="prompt-text is-quoted">Crie uma piada curta e engraçada sobre uma pessoa que
+                confiou
+                cegamente numa informação inventada por uma IA e se deu mal.</p>
+              <div class="px-4 pb-4">
+                <button class="reveal-btn" data-reveal="r-humor" aria-expanded="false">Ver resposta simulada</button>
+                <div id="r-humor" class="reveal-panel hidden">— Por que o aluno tirou zero no trabalho sobre
+                  dinossauros?
+                  — Porque confiou na IA quando ela disse que o Tiranossauro Rex tinha inventado o brigadeiro.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- SLIDE 6 — MÓDULO 2 · O ECOSSISTEMA                         -->
+      <!-- ============================================================ -->
+      <section class="slide" data-index="6" role="group" aria-roledescription="slide"
+        aria-label="Slide 7 de 17 — O Ecossistema">
+        <div class="slide-inner flex flex-col justify-center px-6 pt-20 pb-32 sm:px-14 md:px-24">
+          <div class="max-w-5xl mx-auto w-full">
+            <span class="module-tag bg-signal-light dark:bg-signal-deep/25 text-signal-deep dark:text-signal-glow">Módulo 2 · O Ecossistema</span>
+            <h2 class="slide-title text-3xl sm:text-5xl mb-8">Qual ferramenta usar em cada situação</h2>
+
+            <div class="flex flex-wrap gap-3 mb-6" id="toolFilters">
+              <button class="filter-btn is-active" data-filter="texto">Para pensar e escrever</button>
+              <button class="filter-btn" data-filter="imagem">Para criar imagens</button>
+            </div>
+
+            <div class="grid sm:grid-cols-3 gap-4 mb-8" id="toolGrid">
+              <div class="tool-card" data-cat="texto">
+                <p class="font-display font-semibold text-lg mb-1">ChatGPT</p>
+                <p class="text-xs text-ink/55 mb-3 font-mono">OpenAI</p>
+                <p class="text-sm text-ink/70 leading-relaxed">Uso geral, redação, brainstorm e o maior ecossistema de
+                  plugins.</p>
+              </div>
+              <div class="tool-card" data-cat="texto">
+                <p class="font-display font-semibold text-lg mb-1">Claude</p>
+                <p class="text-xs text-ink/55 mb-3 font-mono">Anthropic</p>
+                <p class="text-sm text-ink/70 leading-relaxed">Textos longos, análise cuidadosa de documentos e escrita
+                  com tom natural.</p>
+              </div>
+              <div class="tool-card" data-cat="texto">
+                <p class="font-display font-semibold text-lg mb-1">Gemini</p>
+                <p class="text-xs text-ink/55 mb-3 font-mono">Google</p>
+                <p class="text-sm text-ink/70 leading-relaxed">Ideal para quem já vive dentro do Gmail, Docs e Agenda
+                  do
+                  Google.</p>
+              </div>
+              <div class="tool-card" data-cat="imagem" style="display:none;">
+                <p class="font-display font-semibold text-lg mb-1">Midjourney</p>
+                <p class="text-xs text-ink/55 mb-3 font-mono">Independente</p>
+                <p class="text-sm text-ink/70 leading-relaxed">Ilustrações e artes com forte qualidade estética a
+                  partir
+                  de uma descrição.</p>
+              </div>
+              <div class="tool-card" data-cat="imagem" style="display:none;">
+                <p class="font-display font-semibold text-lg mb-1">DALL-E</p>
+                <p class="text-xs text-ink/55 mb-3 font-mono">Dentro do ChatGPT</p>
+                <p class="text-sm text-ink/70 leading-relaxed">Gera imagens sem sair da própria conversa que você já
+                  está
+                  tendo.</p>
+              </div>
+              <div class="tool-card" data-cat="imagem" style="display:none;">
+                <p class="font-display font-semibold text-lg mb-1">Gemini / ImageFX</p>
+                <p class="text-xs text-ink/55 mb-3 font-mono">Google</p>
+                <p class="text-sm text-ink/70 leading-relaxed">Opção gratuita e já integrada ao ecossistema Google.</p>
+              </div>
+            </div>
+
+            <p class="text-sm sm:text-base text-ink/65 border-l-2 border-signal pl-4 mb-2">
+              Regra prática: precisa pensar, escrever ou organizar algo? Ferramenta de texto. Precisa de uma imagem que
+              ainda não existe? Ferramenta de imagem.
+            </p>
+            <p class="text-sm text-ink/50 pl-4">Dica: todas têm um plano gratuito — dá para testar antes de decidir
+              qual
+              vale assinar.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- SLIDE 7 — MÓDULO 3 · O CONTRASTE (INTRO)                   -->
+      <!-- ============================================================ -->
+      <section class="slide" data-index="7" role="group" aria-roledescription="slide"
+        aria-label="Slide 8 de 17 — O Contraste">
+        <div class="slide-inner flex flex-col justify-center px-6 pt-20 pb-32 sm:px-14 md:px-24">
+          <div class="max-w-4xl mx-auto w-full">
+            <span class="module-tag bg-warn-light dark:bg-warn-deep/25 text-warn-deep dark:text-warn-glow">Módulo 3 · O Contraste</span>
+            <h2 class="slide-title text-3xl sm:text-5xl mb-6">Lixo entra, lixo sai</h2>
+            <p class="text-base sm:text-lg text-ink/70 leading-relaxed mb-4 max-w-2xl">
+              A IA é como um estagiário genial que não lê pensamento — ela só sabe exatamente o que você disser a ela.
+              Um
+              comando vago devolve uma resposta vaga. Um comando específico devolve uma resposta específica e útil.
+            </p>
+            <p class="text-base sm:text-lg text-ink/70 leading-relaxed mb-10 max-w-2xl">
+              É por isso que duas pessoas usando a mesma ferramenta podem ter experiências completamente diferentes: a
+              diferença nunca está na IA, está no comando.
+            </p>
+
+            <div class="grid sm:grid-cols-2 gap-5">
+              <div class="rounded-2xl border border-warn/30 dark:border-warn-glow/20 bg-warn-light dark:bg-warn-deep/25 px-6 pt-6 pb-32">
+                <p class="font-semibold text-warn-deep dark:text-warn-glow mb-1">Prompt vago</p>
+                <p class="text-sm text-ink/70">→ resposta genérica, que serve para qualquer pessoa e não resolve nada de
+                  verdade.</p>
+              </div>
+              <div class="rounded-2xl border border-good/30 dark:border-good-glow/20 bg-good-light dark:bg-good-deep/25 px-6 pt-6 pb-32">
+                <p class="font-semibold text-good-deep dark:text-good-glow mb-1">Prompt específico</p>
+                <p class="text-sm text-ink/70">→ resposta pronta para usar, no tom certo, com o contexto certo.</p>
+              </div>
+            </div>
+
+            <p class="text-sm text-ink/50 mt-8">A seguir, dois exemplos reais lado a lado.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- SLIDE 8 — MÓDULO 3 · CONTRASTE — PAR 1 (E-MAIL)            -->
+      <!-- ============================================================ -->
+      <section class="slide" data-index="8" role="group" aria-roledescription="slide"
+        aria-label="Slide 9 de 17 — Contraste: E-mail">
+        <div class="slide-inner flex flex-col justify-center px-6 pt-16 pb-32 sm:px-14 md:px-24">
+          <div class="max-w-4xl mx-auto w-full">
+            <span class="module-tag bg-warn-light dark:bg-warn-deep/25 text-warn-deep dark:text-warn-glow">Módulo 3 · O Contraste</span>
+            <h2 class="slide-title text-2xl sm:text-4xl mb-8">Antes e depois: pedir um dia de folga</h2>
+
+            <div class="space-y-5">
+              <div class="prompt-box border-warn/40">
+                <div class="prompt-box-head bg-warn-light dark:bg-warn-deep/25 text-warn-deep dark:text-warn-glow">
+                  <span>✗ Prompt genérico</span>
+                  <button class="copy-btn text-warn-deep dark:text-warn-glow dark:text-warn-glow" data-target="p1-ruim"
+                    aria-label="Copiar prompt genérico de e-mail">Copiar</button>
+                </div>
+                <p id="p1-ruim" class="prompt-text is-quoted">Escreva um email para meu chefe.</p>
+                <div class="px-4 pb-4">
+                  <button class="reveal-btn" data-reveal="r1-ruim" aria-expanded="false">Ver resposta
+                    simulada</button>
+                  <div id="r1-ruim" class="reveal-panel hidden">Prezado(a), espero que esteja bem. Escrevo para tratar
+                    de
+                    um assunto. Poderia me responder quando possível? Atenciosamente.</div>
+                </div>
+              </div>
+
+              <div class="prompt-box border-good/40">
+                <div class="prompt-box-head bg-good-light dark:bg-good-deep/25 text-good-deep dark:text-good-glow">
+                  <span>✓ Prompt excelente</span>
+                  <button class="copy-btn text-good-deep dark:text-good-glow dark:text-good-glow" data-target="p1-bom"
+                    aria-label="Copiar prompt excelente de e-mail">Copiar</button>
+                </div>
+                <p id="p1-bom" class="prompt-text is-quoted">Aja como um assistente de comunicação corporativa. Escreva
+                  um
+                  e-mail profissional e cordial para meu chefe, Sr. Ricardo, pedindo um dia de folga na próxima
+                  sexta-feira (dia 20) por motivos pessoais. O tom deve ser respeitoso e direto, com no máximo 5 frases.
+                  Inclua uma linha de assunto sugestiva.</p>
+                <div class="px-4 pb-4">
+                  <button class="reveal-btn" data-reveal="r1-bom" aria-expanded="false">Ver resposta simulada</button>
+                  <div id="r1-bom" class="reveal-panel hidden">Assunto: Solicitação de folga — sexta-feira, dia 20
+
+                    Olá, Ricardo,
+
+                    Gostaria de solicitar um dia de folga na próxima sexta-feira, dia 20, para resolver um assunto
+                    pessoal. Já organizei minhas entregas da semana para não haver impacto na equipe. Fico à disposição
+                    se
+                    precisar ajustar algo.
+
+                    Atenciosamente,
+                    [Seu nome]</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- SLIDE 9 — MÓDULO 3 · CONTRASTE — PAR 2 (POST)              -->
+      <!-- ============================================================ -->
+      <section class="slide" data-index="9" role="group" aria-roledescription="slide"
+        aria-label="Slide 10 de 17 — Contraste: Post">
+        <div class="slide-inner flex flex-col justify-center px-6 pt-16 pb-32 sm:px-14 md:px-24">
+          <div class="max-w-4xl mx-auto w-full">
+            <span class="module-tag bg-warn-light dark:bg-warn-deep/25 text-warn-deep dark:text-warn-glow">Módulo 3 · O Contraste</span>
+            <h2 class="slide-title text-2xl sm:text-4xl mb-8">Antes e depois: post para redes sociais</h2>
+
+            <div class="space-y-5">
+              <div class="prompt-box border-warn/40">
+                <div class="prompt-box-head bg-warn-light dark:bg-warn-deep/25 text-warn-deep dark:text-warn-glow">
+                  <span>✗ Prompt genérico</span>
+                  <button class="copy-btn text-warn-deep dark:text-warn-glow dark:text-warn-glow" data-target="p2-ruim"
+                    aria-label="Copiar prompt genérico de post">Copiar</button>
+                </div>
+                <p id="p2-ruim" class="prompt-text is-quoted">Crie um post para Instagram sobre meu produto.</p>
+                <div class="px-4 pb-4">
+                  <button class="reveal-btn" data-reveal="r2-ruim" aria-expanded="false">Ver resposta
+                    simulada</button>
+                  <div id="r2-ruim" class="reveal-panel hidden">Confira nosso produto! Ele é ótimo e vai te
+                    surpreender.
+                    Não perca essa oportunidade incrível. #produto #promoção</div>
+                </div>
+              </div>
+
+              <div class="prompt-box border-good/40">
+                <div class="prompt-box-head bg-good-light dark:bg-good-deep/25 text-good-deep dark:text-good-glow">
+                  <span>✓ Prompt excelente</span>
+                  <button class="copy-btn text-good-deep dark:text-good-glow dark:text-good-glow" data-target="p2-bom"
+                    aria-label="Copiar prompt excelente de post">Copiar</button>
+                </div>
+                <p id="p2-bom" class="prompt-text is-quoted">Você é um especialista em marketing digital para pequenos
+                  negócios. Crie 3 opções de legenda para um post no Instagram divulgando uma promoção de 20% de
+                  desconto
+                  em brigadeiros gourmet, válida até domingo. O tom deve ser descontraído e usar emojis. Inclua uma
+                  chamada para ação clara ao final de cada opção e sugira 5 hashtags relevantes.</p>
+                <div class="px-4 pb-4">
+                  <button class="reveal-btn" data-reveal="r2-bom" aria-expanded="false">Ver resposta simulada</button>
+                  <div id="r2-bom" class="reveal-panel hidden">🍫 Só até domingo: 20% OFF em todos os brigadeiros
+                    gourmet!
+                    Aquele mimo que cabe no seu dia (e no seu bolso). Chama no direct e garanta o seu! 👉
+
+                    #BrigadeiroGourmet #PromoçãoDoceria #DescontoEspecial #DoceDeQualidade #PeçaJá</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- SLIDE 10 — MÓDULO 4 · MÃO NA MASSA — FÓRMULA P.A.C.F.     -->
+      <!-- ============================================================ -->
+      <section class="slide" data-index="10" role="group" aria-roledescription="slide"
+        aria-label="Slide 11 de 17 — Fórmula P.A.C.F.">
+        <div class="slide-inner flex flex-col justify-center px-6 pt-16 pb-32 sm:px-14 md:px-24">
+          <div class="max-w-5xl mx-auto w-full">
+            <span class="module-tag bg-gold-light dark:bg-gold-deep/25 text-gold-deep dark:text-gold-glow">Módulo 4 · Mão na Massa</span>
+            <h2 class="slide-title text-3xl sm:text-5xl mb-10">A fórmula que muda tudo: P.A.C.F.</h2>
+
+            <div class="grid sm:grid-cols-2 gap-4 mb-6">
+              <div class="rounded-2xl border border-line bg-surface px-6 pt-5 pb-32">
+                <p class="font-display text-3xl text-brand dark:text-brand-glow mb-1">P</p>
+                <p class="font-semibold mb-1">Persona</p>
+                <p class="text-sm text-ink/65 mb-3">Quem a IA deve "ser" ao responder.</p>
+                <p class="text-xs font-mono text-ink/50">"um assistente de comunicação corporativa"</p>
+              </div>
+              <div class="rounded-2xl border border-line bg-surface px-6 pt-5 pb-32">
+                <p class="font-display text-3xl text-signal dark:text-signal-glow mb-1">A</p>
+                <p class="font-semibold mb-1">Ação</p>
+                <p class="text-sm text-ink/65 mb-3">O verbo claro do que precisa ser feito.</p>
+                <p class="text-xs font-mono text-ink/50">"escreva um e-mail profissional e cordial"</p>
+              </div>
+              <div class="rounded-2xl border border-line bg-surface px-6 pt-5 pb-32">
+                <p class="font-display text-3xl text-gold-deep dark:text-gold-glow dark:text-gold-glow mb-1">C</p>
+                <p class="font-semibold mb-1">Contexto</p>
+                <p class="text-sm text-ink/65 mb-3">Os detalhes que só você sabe.</p>
+                <p class="text-xs font-mono text-ink/50">"pedindo folga na sexta (dia 20), motivos pessoais"</p>
+              </div>
+              <div class="rounded-2xl border border-line bg-surface px-6 pt-5 pb-32">
+                <p class="font-display text-3xl text-good dark:text-good-glow mb-1">F</p>
+                <p class="font-semibold mb-1">Formato</p>
+                <p class="text-sm text-ink/65 mb-3">Como a resposta deve se apresentar.</p>
+                <p class="text-xs font-mono text-ink/50">"tom respeitoso, até 5 frases, com assunto"</p>
+              </div>
+            </div>
+
+            <div class="rounded-xl border border-gold/30 dark:border-gold-glow/20 bg-gold-light dark:bg-gold-deep/25 px-5 pt-4 pb-32">
+              <p class="text-sm text-gold-deep dark:text-gold-glow"><span class="font-semibold">Dica:</span> depois de escrever seu prompt,
+                peça para a própria IA revisá-lo: "Melhore este prompt usando a fórmula Persona, Ação, Contexto e
+                Formato."</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- SLIDE 11 — MÓDULO 4 · MÃO NA MASSA — PRÁTICA + CRONÔMETRO  -->
+      <!-- ============================================================ -->
+      <section class="slide" data-index="11" role="group" aria-roledescription="slide"
+        aria-label="Slide 12 de 17 — Mão na Massa">
+        <div class="slide-inner flex flex-col justify-center px-6 pt-14 pb-32 sm:px-14 md:px-20">
+          <div class="max-w-6xl mx-auto w-full">
+            <span class="module-tag bg-gold-light dark:bg-gold-deep/25 text-gold-deep dark:text-gold-glow">Módulo 4 · Mão na Massa</span>
+            <h2 class="slide-title text-2xl sm:text-4xl mb-8">Sua vez: monte seu prompt</h2>
+
+            <div class="grid lg:grid-cols-5 gap-6">
+              <!-- Construtor -->
+              <div class="lg:col-span-3 rounded-2xl border border-line bg-surface p-6">
+                <p class="text-xs font-semibold text-ink/50 mb-1">Preencha os quatro campos com sua tarefa real</p>
+                <p class="text-xs text-ink/45 mb-4">Dica: escreva como se estivesse explicando para uma pessoa nova na
+                  equipe — quanto mais detalhe, melhor o resultado.</p>
+                <div class="grid sm:grid-cols-2 gap-4 mb-5">
+                  <div class="builder-field">
+                    <label for="bPersona">Persona</label>
+                    <input id="bPersona" class="builder-style-input" type="text" autocomplete="off"
+                      placeholder="ex: um nutricionista esportivo" />
+                  </div>
+                  <div class="builder-field">
+                    <label for="bAcao">Ação</label>
+                    <input id="bAcao" class="builder-style-input" type="text" autocomplete="off"
+                      placeholder="ex: monte um cardápio de café da manhã" />
+                  </div>
+                  <div class="builder-field">
+                    <label for="bContexto">Contexto</label>
+                    <input id="bContexto" class="builder-style-input" type="text" autocomplete="off"
+                      placeholder="ex: para quem treina de manhã e tem 15 minutos" />
+                  </div>
+                  <div class="builder-field">
+                    <label for="bFormato">Formato</label>
+                    <input id="bFormato" class="builder-style-input" type="text" autocomplete="off"
+                      placeholder="ex: lista, com horários sugeridos" />
+                  </div>
+                </div>
+                <div class="prompt-box border-brand/25">
+                  <div class="prompt-box-head bg-brand-light dark:bg-brand-deep/25 text-brand">
+                    <span>Seu prompt montado</span>
+                    <button class="copy-btn text-brand-deep dark:text-brand-glow dark:text-brand-glow" data-target="builderOutput"
+                      aria-label="Copiar prompt montado">Copiar</button>
+                  </div>
+                  <p id="builderOutput" class="prompt-text"></p>
+                </div>
+              </div>
+
+              <!-- Cronômetro -->
+              <div class="lg:col-span-2 rounded-2xl border border-line bg-surface p-6 flex flex-col">
+                <p class="text-xs font-semibold text-ink/50 mb-4">Cronômetro da dinâmica</p>
+                <div class="flex-1 flex flex-col items-center justify-center text-center gap-4">
+                  <p id="timerDisplay" class="timer-display text-5xl sm:text-6xl text-brand-deep dark:text-brand-glow dark:text-brand-glow">
+                    15:00</p>
+                  <div class="timer-track w-full max-w-[220px]">
+                    <div id="timerFill" class="timer-fill"></div>
+                  </div>
+                  <div class="flex flex-wrap gap-2 justify-center" id="timerPresets">
+                    <button class="timer-preset" data-mins="10">10 min</button>
+                    <button class="timer-preset is-active" data-mins="15">15 min</button>
+                    <button class="timer-preset" data-mins="20">20 min</button>
+                  </div>
+                  <div class="flex flex-wrap gap-2 mt-2 justify-center">
+                    <button id="timerStart" class="timer-ctrl bg-brand text-white">Iniciar</button>
+                    <button id="timerPause" class="timer-ctrl bg-brand-light dark:bg-brand-deep/25 text-brand" disabled>Pausar</button>
+                    <button id="timerReset" class="timer-ctrl bg-surface text-ink/60"
+                      style="border:1px solid var(--c-line);">Resetar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- SLIDE 12 — DESAFIO-RELÂMPAGO (PLACAR AO VIVO)              -->
+      <!-- ============================================================ -->
+      <section class="slide" data-index="12" role="group" aria-roledescription="slide"
+        aria-label="Slide 13 de 17 — Desafio-Relâmpago">
+        <div class="slide-inner flex flex-col justify-center px-6 pt-14 pb-32 sm:px-14 md:px-20">
+          <div class="max-w-6xl mx-auto w-full">
+            <span class="module-tag bg-gold-light dark:bg-gold-deep/25 text-gold-deep dark:text-gold-glow">Módulo 4 · Mão na Massa</span>
+            <h2 class="slide-title text-2xl sm:text-4xl mb-8">Desafio-relâmpago: quem monta o melhor prompt?</h2>
+
+            <div class="grid lg:grid-cols-2 gap-6">
+              <div class="rounded-2xl border border-line bg-surface p-6">
+                <p class="text-xs font-semibold text-ink/50 mb-3">Desafio da rodada</p>
+                <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
+                  <p id="challengeText" class="flex-1 font-display text-lg sm:text-xl text-ink">Toque em "sortear"
+                    para
+                    começar</p>
+                  <button id="drawChallenge" class="timer-ctrl bg-gold text-white shrink-0">🎲 Sortear
+                    desafio</button>
+                </div>
+                <p class="text-xs text-ink/45">Cada dupla tem alguns minutos para montar o melhor prompt possível usando
+                  a
+                  fórmula P.A.C.F. A turma vota no favorito e a dupla vencedora marca o ponto ao lado.</p>
+              </div>
+
+              <div class="rounded-2xl border border-line bg-surface p-6">
+                <p class="text-xs font-semibold text-ink/50 mb-3">Placar ao vivo</p>
+                <div class="flex flex-col sm:flex-row gap-2 mb-4">
+                  <input id="teamNameInput" type="text" placeholder="Nome da dupla" class="builder-style-input flex-1"
+                    maxlength="24" autocomplete="off" />
+                  <button id="addTeamBtn" class="timer-ctrl bg-brand text-white shrink-0">Adicionar</button>
+                </div>
+                <div id="scoreboardList" class="space-y-2 mb-3"></div>
+                <p id="scoreboardEmpty" class="text-xs text-ink/40">Adicione as duplas para começar a marcar pontos.</p>
+                <button id="resetScoreboard" class="reveal-btn mt-2">Reiniciar placar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- SLIDE 13 — MÓDULO 5 · SOUVENIR DIGITAL                     -->
+      <!-- ============================================================ -->
+      <section class="slide" data-index="13" role="group" aria-roledescription="slide"
+        aria-label="Slide 14 de 17 — Souvenir Digital">
+        <div class="slide-inner flex flex-col justify-center px-6 pt-16 pb-32 sm:px-14 md:px-24">
+          <div class="max-w-4xl mx-auto w-full">
+            <span class="module-tag bg-good-light dark:bg-good-deep/25 text-good-deep dark:text-good-glow">Módulo 5 · O Souvenir Digital</span>
+            <h2 class="slide-title text-3xl sm:text-5xl mb-4">Leve algo com você</h2>
+            <p class="text-base text-ink/65 mb-6 max-w-2xl">Escolha um estilo e veja o prompt se ajustar na hora —
+              depois
+              é só copiar e colar na sua ferramenta de imagem preferida.</p>
+
+            <div class="flex flex-wrap gap-2 mb-5" id="styleChips">
+              <button class="style-chip is-active" data-style="aquarela">Aquarela</button>
+              <button class="style-chip" data-style="pixar 3D">Pixar 3D</button>
+              <button class="style-chip" data-style="minimalista">Minimalista</button>
+              <button class="style-chip" data-style="cyberpunk">Cyberpunk</button>
             </div>
 
             <div class="prompt-box border-good/40">
-              <div class="prompt-box-head bg-good-light text-good-deep">
-                <span>✓ Prompt excelente</span>
-                <button class="copy-btn text-good-deep dark:text-good-glow" data-target="p1-bom">Copiar</button>
+              <div class="prompt-box-head bg-good-light dark:bg-good-deep/25 text-good-deep dark:text-good-glow">
+                <span>Imagem inspiradora</span>
+                <button class="copy-btn text-good-deep dark:text-good-glow dark:text-good-glow" data-target="p3-imagem"
+                  aria-label="Copiar prompt de imagem">Copiar</button>
               </div>
-              <p id="p1-bom" class="prompt-text is-quoted">Aja como um assistente de comunicação corporativa. Escreva um
-                e-mail profissional e cordial para meu chefe, Sr. Ricardo, pedindo um dia de folga na próxima
-                sexta-feira (dia 20) por motivos pessoais. O tom deve ser respeitoso e direto, com no máximo 5 frases.
-                Inclua uma linha de assunto sugestiva.</p>
-              <div class="px-4 pb-4">
-                <button class="reveal-btn" data-reveal="r1-bom" aria-expanded="false">Ver resposta simulada</button>
-                <div id="r1-bom" class="reveal-panel hidden">Assunto: Solicitação de folga — sexta-feira, dia 20
+              <p id="p3-imagem" class="prompt-text is-quoted"></p>
+            </div>
 
-                  Olá, Ricardo,
+            <p class="text-sm text-ink/50 mt-8">Essa é a mesma lógica do Módulo 4 — a fórmula P.A.C.F., aplicada de
+              forma
+              lúdica.</p>
+          </div>
+        </div>
+      </section>
 
-                  Gostaria de solicitar um dia de folga na próxima sexta-feira, dia 20, para resolver um assunto
-                  pessoal. Já organizei minhas entregas da semana para não haver impacto na equipe. Fico à disposição se
-                  precisar ajustar algo.
+      <!-- ============================================================ -->
+      <!-- SLIDE 14 — ANTES DE FECHAR (FUTURO DO TRABALHO)             -->
+      <!-- ============================================================ -->
+      <section class="slide" data-index="14" role="group" aria-roledescription="slide"
+        aria-label="Slide 15 de 17 — Futuro do Trabalho">
+        <div class="slide-inner flex flex-col justify-center px-6 pt-16 pb-32 sm:px-14 md:px-24">
+          <div class="max-w-4xl mx-auto w-full">
+            <span class="module-tag bg-brand-light dark:bg-brand-deep/25 text-brand">Antes de fechar</span>
+            <h2 class="slide-title text-3xl sm:text-5xl mb-6">A IA vai tirar o meu emprego?</h2>
+            <p class="text-base sm:text-lg text-ink/70 leading-relaxed mb-8 max-w-2xl">
+              É uma pergunta honesta — e a resposta sincera é que ninguém sabe ao certo, nem os especialistas concordam
+              entre si. Mas dá para dizer com mais segurança o seguinte:
+            </p>
 
-                  Atenciosamente,
-                  [Seu nome]</div>
+            <div class="grid sm:grid-cols-2 gap-5 mb-8">
+              <div class="rounded-2xl border border-line bg-surface px-6 pt-6 pb-32">
+                <p class="font-semibold text-ink mb-2">Tende a mudar</p>
+                <p class="text-sm text-ink/65 leading-relaxed">Tarefas repetitivas e burocráticas tendem a ser cada vez
+                  mais automatizadas, e algumas funções vão se transformar bastante nos próximos anos.</p>
               </div>
+              <div class="rounded-2xl border border-line bg-surface px-6 pt-6 pb-32">
+                <p class="font-semibold text-ink mb-2">Tende a continuar valendo</p>
+                <p class="text-sm text-ink/65 leading-relaxed">Pensamento crítico, criatividade, relação com pessoas e a
+                  capacidade de fazer boas perguntas — exatamente o que treinamos hoje.</p>
+              </div>
+            </div>
+
+            <div class="rounded-xl border border-brand/25 bg-brand-light dark:bg-brand-deep/25 px-5 pt-4 pb-32">
+              <p class="text-sm text-brand-deep dark:text-brand-glow dark:text-brand-glow">Ninguém tem a resposta definitiva. Mas quem
+                aprende
+                a trabalhar <span class="font-semibold">com</span> a IA, em vez de competir contra ela, tende a sair na
+                frente — seja qual for a profissão.</p>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- ============================================================ -->
-    <!-- SLIDE 6 — MÓDULO 3 — PAR 2 (POST) -->
-    <!-- ============================================================ -->
-    <section class="slide" data-index="9">
-      <div class="slide-inner flex flex-col justify-center px-6 py-16 sm:px-14 md:px-24">
-        <div class="max-w-4xl mx-auto w-full">
-          <span class="module-tag bg-warn-light text-warn-deep">Módulo 3 · O Contraste</span>
-          <h2 class="slide-title text-2xl sm:text-4xl mb-8">Antes e depois: post para redes sociais</h2>
-
-          <div class="space-y-5">
-            <div class="prompt-box border-warn/40">
-              <div class="prompt-box-head bg-warn-light text-warn-deep">
-                <span>✗ Prompt genérico</span>
-                <button class="copy-btn text-warn-deep dark:text-warn-glow" data-target="p2-ruim">Copiar</button>
-              </div>
-              <p id="p2-ruim" class="prompt-text is-quoted">Crie um post para Instagram sobre meu produto.</p>
-              <div class="px-4 pb-4">
-                <button class="reveal-btn" data-reveal="r2-ruim" aria-expanded="false">Ver resposta simulada</button>
-                <div id="r2-ruim" class="reveal-panel hidden">Confira nosso produto! Ele é ótimo e vai te surpreender.
-                  Não perca essa oportunidade incrível. #produto #promoção</div>
-              </div>
+      <!-- ============================================================ -->
+      <!-- SLIDE 15 — MATERIAIS DE APOIO                               -->
+      <!-- ============================================================ -->
+      <section class="slide" data-index="15" role="group" aria-roledescription="slide"
+        aria-label="Slide 16 de 17 — Materiais de Apoio">
+        <div class="slide-inner flex flex-col justify-center px-6 pt-16 pb-32 sm:px-14 md:px-24">
+          <div class="max-w-5xl mx-auto w-full">
+            <span class="module-tag bg-brand-light dark:bg-brand-deep/25 text-brand">Para levar com você</span>
+            <h2 class="slide-title text-3xl sm:text-5xl mb-4">Materiais de Apoio</h2>
+            <p class="text-base sm:text-lg text-ink/65 leading-relaxed mb-8 max-w-2xl">
+              Três documentos para levar com você e continuar praticando depois da oficina.
+            </p>
+            <div class="grid sm:grid-cols-3 gap-4 mb-6">
+              <a href="Material 3 - Guia Rapido de Boas Praticas.docx" download class="tool-card material-card-gold block hover:-translate-y-1 transition-transform">
+                <p class="text-2xl mb-2" aria-hidden="true">&#129517;</p>
+                <p class="font-display font-semibold text-base mb-1">Guia de Boas Práticas da Engenharia de Prompt</p>
+                <p class="text-sm text-ink/65 leading-relaxed">Um manual rápido com a fórmula P.A.C.F. e as principais
+                  dicas para tirar o máximo de qualquer IA.</p>
+              </a>
+              <a href="Material 1 - Prompts para Curriculo e Entrevista.docx" download class="tool-card material-card-brand block hover:-translate-y-1 transition-transform">
+                <p class="text-2xl mb-2" aria-hidden="true">&#128196;</p>
+                <p class="font-display font-semibold text-base mb-1">Prompts para Currículo e Entrevista de Estágio</p>
+                <p class="text-sm text-ink/65 leading-relaxed">Modelos prontos para montar currículo, carta de
+                  apresentação e treinar respostas de entrevista.</p>
+              </a>
+              <a href="Material 2 - Prompts para Estudar e Revisar Materia.docx" download class="tool-card material-card-signal block hover:-translate-y-1 transition-transform">
+                <p class="text-2xl mb-2" aria-hidden="true">&#128218;</p>
+                <p class="font-display font-semibold text-base mb-1">Prompts para Estudar e Revisar Matéria</p>
+                <p class="text-sm text-ink/65 leading-relaxed">Modelos para gerar resumos, questões de simulado e
+                  explicações sob medida para cada matéria.</p>
+              </a>
             </div>
 
-            <div class="prompt-box border-good/40">
-              <div class="prompt-box-head bg-good-light text-good-deep">
-                <span>✓ Prompt excelente</span>
-                <button class="copy-btn text-good-deep dark:text-good-glow" data-target="p2-bom">Copiar</button>
-              </div>
-              <p id="p2-bom" class="prompt-text is-quoted">Você é um especialista em marketing digital para pequenos
-                negócios. Crie 3 opções de legenda para um post no Instagram divulgando uma promoção de 20% de desconto
-                em brigadeiros gourmet, válida até domingo. O tom deve ser descontraído e usar emojis. Inclua uma
-                chamada para ação clara ao final de cada opção e sugira 5 hashtags relevantes.</p>
-              <div class="px-4 pb-4">
-                <button class="reveal-btn" data-reveal="r2-bom" aria-expanded="false">Ver resposta simulada</button>
-                <div id="r2-bom" class="reveal-panel hidden">🍫 Só até domingo: 20% OFF em todos os brigadeiros gourmet!
-                  Aquele mimo que cabe no seu dia (e no seu bolso). Chama no direct e garanta o seu! 👉
-
-                  #BrigadeiroGourmet #PromoçãoDoceria #DescontoEspecial #DoceDeQualidade #PeçaJá</div>
-              </div>
-            </div>
+            <p class="text-sm text-ink/50">Esses materiais serão entregues em formato Word ao final da oficina.</p>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- ============================================================ -->
-    <!-- SLIDE 7 — MÓDULO 4a — FÓRMULA P.A.C.F. -->
-    <!-- ============================================================ -->
-    <section class="slide" data-index="10">
-      <div class="slide-inner flex flex-col justify-center px-6 py-16 sm:px-14 md:px-24">
-        <div class="max-w-5xl mx-auto w-full">
-          <span class="module-tag bg-gold-light text-gold-deep">Módulo 4 · Mão na Massa</span>
-          <h2 class="slide-title text-3xl sm:text-5xl mb-10">A fórmula que muda tudo: P.A.C.F.</h2>
+      <!-- ============================================================ -->
+      <!-- SLIDE 16 — FECHAMENTO                                       -->
+      <!-- ============================================================ -->
+      <section class="slide" data-index="16" role="group" aria-roledescription="slide"
+        aria-label="Slide 17 de 17 — Fechamento">
+        <div class="slide-inner flex flex-col items-center justify-center px-6 pt-16 pb-32 sm:px-14 text-center">
+          <div class="max-w-2xl mx-auto w-full">
+            <span class="module-tag bg-brand-light dark:bg-brand-deep/25 text-brand">Fechamento</span>
+            <h2 class="slide-title text-3xl sm:text-5xl mb-6">Você já sabe o suficiente para começar</h2>
+            <p class="text-ink/65 mb-8 max-w-lg mx-auto leading-relaxed">
+              Da próxima vez que abrir uma IA, lembre-se: persona, ação, contexto e formato. É a diferença entre uma
+              resposta genérica e uma resposta que resolve seu problema de verdade.
+            </p>
 
-          <div class="grid sm:grid-cols-2 gap-4 mb-6">
-            <div class="rounded-2xl border border-line bg-surface px-6 py-5">
-              <p class="font-display text-3xl text-brand dark:text-brand-glow mb-1">P</p>
-              <p class="font-semibold mb-1">Persona</p>
-              <p class="text-sm text-ink/65 mb-3">Quem a IA deve "ser" ao responder.</p>
-              <p class="text-xs font-mono text-ink/50">"um assistente de comunicação corporativa"</p>
-            </div>
-            <div class="rounded-2xl border border-line bg-surface px-6 py-5">
-              <p class="font-display text-3xl text-signal dark:text-signal-glow mb-1">A</p>
-              <p class="font-semibold mb-1">Ação</p>
-              <p class="text-sm text-ink/65 mb-3">O verbo claro do que precisa ser feito.</p>
-              <p class="text-xs font-mono text-ink/50">"escreva um e-mail profissional e cordial"</p>
-            </div>
-            <div class="rounded-2xl border border-line bg-surface px-6 py-5">
-              <p class="font-display text-3xl text-gold-deep dark:text-gold-glow mb-1">C</p>
-              <p class="font-semibold mb-1">Contexto</p>
-              <p class="text-sm text-ink/65 mb-3">Os detalhes que só você sabe.</p>
-              <p class="text-xs font-mono text-ink/50">"pedindo folga na sexta (dia 20), motivos pessoais"</p>
-            </div>
-            <div class="rounded-2xl border border-line bg-surface px-6 py-5">
-              <p class="font-display text-3xl text-good dark:text-good-glow mb-1">F</p>
-              <p class="font-semibold mb-1">Formato</p>
-              <p class="text-sm text-ink/65 mb-3">Como a resposta deve se apresentar.</p>
-              <p class="text-xs font-mono text-ink/50">"tom respeitoso, até 5 frases, com assunto"</p>
-            </div>
-          </div>
+            <ul class="text-left space-y-3 mb-10 text-ink/75">
+              <li class="flex gap-3"><span class="text-brand dark:text-brand-glow font-bold">1</span> A IA não é
+                mágica, é
+                padrão.</li>
+              <li class="flex gap-3"><span class="text-signal dark:text-signal-glow font-bold">2</span> Existe a
+                ferramenta certa para cada tarefa.</li>
+              <li class="flex gap-3"><span class="text-warn dark:text-warn-glow font-bold">3</span> Um prompt específico
+                muda tudo.</li>
+              <li class="flex gap-3"><span class="text-gold-deep dark:text-gold-glow dark:text-gold-glow font-bold">4</span> A fórmula
+                P.A.C.F. é o seu atalho.</li>
+              <li class="flex gap-3"><span class="text-good dark:text-good-glow font-bold">5</span> A prática é o único
+                caminho — comece hoje.</li>
+            </ul>
 
-          <div class="rounded-xl border border-gold/30 bg-gold-light px-5 py-4">
-            <p class="text-sm text-gold-deep"><span class="font-semibold">Dica:</span> depois de escrever seu prompt,
-              peça para a própria IA revisá-lo: "Melhore este prompt usando a fórmula Persona, Ação, Contexto e
-              Formato."</p>
+            <div
+              class="flex items-center justify-center gap-2 font-mono text-base sm:text-lg text-brand/70 dark:text-brand-glow">
+              <span>&gt;</span>
+              <span id="closingTyped"></span><span class="cursor-blink">▌</span>
+            </div>
+            <p class="text-ink/55 mt-8">Perguntas?</p>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- ============================================================ -->
-    <!-- SLIDE 8 — MÓDULO 4b — PRÁTICA + CRONÔMETRO -->
-    <!-- ============================================================ -->
-    <section class="slide" data-index="11">
-      <div class="slide-inner flex flex-col justify-center px-6 py-14 sm:px-14 md:px-20">
-        <div class="max-w-6xl mx-auto w-full">
-          <span class="module-tag bg-gold-light text-gold-deep">Módulo 4 · Mão na Massa</span>
-          <h2 class="slide-title text-2xl sm:text-4xl mb-8">Sua vez: monte seu prompt</h2>
-
-          <div class="grid lg:grid-cols-5 gap-6">
-            <!-- Construtor -->
-            <div class="lg:col-span-3 rounded-2xl border border-line bg-surface p-6">
-              <p class="text-xs font-semibold text-ink/50 mb-1">Preencha os quatro campos com sua tarefa real</p>
-              <p class="text-xs text-ink/45 mb-4">Dica: escreva como se estivesse explicando para uma pessoa nova na
-                equipe — quanto mais detalhe, melhor o resultado.</p>
-              <div class="grid sm:grid-cols-2 gap-4 mb-5">
-                <div class="builder-field">
-                  <label for="bPersona">Persona</label>
-                  <input id="bPersona" type="text" placeholder="ex: um nutricionista esportivo" />
-                </div>
-                <div class="builder-field">
-                  <label for="bAcao">Ação</label>
-                  <input id="bAcao" type="text" placeholder="ex: monte um cardápio de café da manhã" />
-                </div>
-                <div class="builder-field">
-                  <label for="bContexto">Contexto</label>
-                  <input id="bContexto" type="text" placeholder="ex: para quem treina de manhã e tem 15 minutos" />
-                </div>
-                <div class="builder-field">
-                  <label for="bFormato">Formato</label>
-                  <input id="bFormato" type="text" placeholder="ex: lista, com horários sugeridos" />
-                </div>
-              </div>
-              <div class="prompt-box border-brand/25">
-                <div class="prompt-box-head bg-brand-light text-brand">
-                  <span>Seu prompt montado</span>
-                  <button class="copy-btn text-brand-deep dark:text-brand-glow"
-                    data-target="builderOutput">Copiar</button>
-                </div>
-                <p id="builderOutput" class="prompt-text"></p>
-              </div>
-            </div>
-
-            <!-- Cronômetro -->
-            <div class="lg:col-span-2 rounded-2xl border border-line bg-surface p-6 flex flex-col">
-              <p class="text-xs font-semibold text-ink/50 mb-4">Cronômetro da dinâmica</p>
-              <div class="flex-1 flex flex-col items-center justify-center text-center gap-4">
-                <p id="timerDisplay" class="timer-display text-5xl sm:text-6xl text-brand-deep dark:text-brand-glow">
-                  15:00</p>
-                <div class="timer-track w-full max-w-[220px]">
-                  <div id="timerFill" class="timer-fill"></div>
-                </div>
-                <div class="flex flex-wrap gap-2 justify-center" id="timerPresets">
-                  <button class="timer-preset" data-mins="10">10 min</button>
-                  <button class="timer-preset is-active" data-mins="15">15 min</button>
-                  <button class="timer-preset" data-mins="20">20 min</button>
-                </div>
-                <div class="flex flex-wrap gap-2 mt-2 justify-center">
-                  <button id="timerStart" class="timer-ctrl bg-brand text-white">Iniciar</button>
-                  <button id="timerPause" class="timer-ctrl bg-brand-light text-brand" disabled>Pausar</button>
-                  <button id="timerReset" class="timer-ctrl bg-surface text-ink/60"
-                    style="border:1px solid var(--c-line);">Resetar</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-
-    <!-- ============================================================ -->
-    <!-- SLIDE — DESAFIO-RELÂMPAGO (PLACAR AO VIVO) -->
-    <!-- ============================================================ -->
-    <section class="slide" data-index="12">
-      <div class="slide-inner flex flex-col justify-center px-6 py-14 sm:px-14 md:px-20">
-        <div class="max-w-6xl mx-auto w-full">
-          <span class="module-tag bg-gold-light text-gold-deep">Módulo 4 · Mão na Massa</span>
-          <h2 class="slide-title text-2xl sm:text-4xl mb-8">Desafio-relâmpago: quem monta o melhor prompt?</h2>
-
-          <div class="grid lg:grid-cols-2 gap-6">
-            <div class="rounded-2xl border border-line bg-surface p-6">
-              <p class="text-xs font-semibold text-ink/50 mb-3">Desafio da rodada</p>
-              <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
-                <p id="challengeText" class="flex-1 font-display text-lg sm:text-xl text-ink">Toque em "sortear" para
-                  começar</p>
-                <button id="drawChallenge" class="timer-ctrl bg-gold text-white shrink-0">🎲 Sortear desafio</button>
-              </div>
-              <p class="text-xs text-ink/45">Cada dupla tem alguns minutos para montar o melhor prompt possível usando a
-                fórmula P.A.C.F. A turma vota no favorito e a dupla vencedora marca o ponto ao lado.</p>
-            </div>
-
-            <div class="rounded-2xl border border-line bg-surface p-6">
-              <p class="text-xs font-semibold text-ink/50 mb-3">Placar ao vivo</p>
-              <div class="flex flex-col sm:flex-row gap-2 mb-4">
-                <input id="teamNameInput" type="text" placeholder="Nome da dupla" class="builder-style-input flex-1"
-                  maxlength="24" />
-                <button id="addTeamBtn" class="timer-ctrl bg-brand text-white shrink-0">Adicionar</button>
-              </div>
-              <div id="scoreboardList" class="space-y-2 mb-3"></div>
-              <p id="scoreboardEmpty" class="text-xs text-ink/40">Adicione as duplas para começar a marcar pontos.</p>
-              <button id="resetScoreboard" class="reveal-btn mt-2">Reiniciar placar</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <!-- ============================================================ -->
-    <!-- SLIDE 9 — MÓDULO 5 — SOUVENIR DIGITAL -->
-    <!-- ============================================================ -->
-    <section class="slide" data-index="13">
-      <div class="slide-inner flex flex-col justify-center px-6 py-16 sm:px-14 md:px-24">
-        <div class="max-w-4xl mx-auto w-full">
-          <span class="module-tag bg-good-light text-good-deep">Módulo 5 · O Souvenir Digital</span>
-          <h2 class="slide-title text-3xl sm:text-5xl mb-4">Leve algo com você</h2>
-          <p class="text-base text-ink/65 mb-6 max-w-2xl">Escolha um estilo e veja o prompt se ajustar na hora — depois
-            é só copiar e colar na sua ferramenta de imagem preferida.</p>
-
-          <div class="flex flex-wrap gap-2 mb-5" id="styleChips">
-            <button class="filter-btn is-active" data-style="aquarela">Aquarela</button>
-            <button class="filter-btn" data-style="pixar 3D">Pixar 3D</button>
-            <button class="filter-btn" data-style="minimalista">Minimalista</button>
-            <button class="filter-btn" data-style="cyberpunk">Cyberpunk</button>
-          </div>
-
-          <div class="prompt-box border-good/40">
-            <div class="prompt-box-head bg-good-light text-good-deep">
-              <span>Imagem inspiradora</span>
-              <button class="copy-btn text-good-deep dark:text-good-glow" data-target="p3-imagem">Copiar</button>
-            </div>
-            <p id="p3-imagem" class="prompt-text is-quoted"></p>
-          </div>
-
-          <p class="text-sm text-ink/50 mt-8">Essa é a mesma lógica do Módulo 4 — a fórmula P.A.C.F., aplicada de forma
-            lúdica.</p>
-        </div>
-      </div>
-    </section>
-
-
-    <!-- ============================================================ -->
-    <!-- SLIDE — ANTES DE FECHAR (FUTURO DO TRABALHO) -->
-    <!-- ============================================================ -->
-    <section class="slide" data-index="14">
-      <div class="slide-inner flex flex-col justify-center px-6 py-16 sm:px-14 md:px-24">
-        <div class="max-w-4xl mx-auto w-full">
-          <span class="module-tag bg-brand-light text-brand">Antes de fechar</span>
-          <h2 class="slide-title text-3xl sm:text-5xl mb-6">A IA vai tirar o meu emprego?</h2>
-          <p class="text-base sm:text-lg text-ink/70 leading-relaxed mb-8 max-w-2xl">
-            É uma pergunta honesta — e a resposta sincera é que ninguém sabe ao certo, nem os especialistas concordam
-            entre si. Mas dá para dizer com mais segurança o seguinte:
-          </p>
-
-          <div class="grid sm:grid-cols-2 gap-5 mb-8">
-            <div class="rounded-2xl border border-line bg-surface px-6 py-6">
-              <p class="font-semibold text-ink mb-2">Tende a mudar</p>
-              <p class="text-sm text-ink/65 leading-relaxed">Tarefas repetitivas e burocráticas tendem a ser cada vez
-                mais automatizadas, e algumas funções vão se transformar bastante nos próximos anos.</p>
-            </div>
-            <div class="rounded-2xl border border-line bg-surface px-6 py-6">
-              <p class="font-semibold text-ink mb-2">Tende a continuar valendo</p>
-              <p class="text-sm text-ink/65 leading-relaxed">Pensamento crítico, criatividade, relação com pessoas e a
-                capacidade de fazer boas perguntas — exatamente o que treinamos hoje.</p>
-            </div>
-          </div>
-
-          <div class="rounded-xl border border-brand/25 bg-brand-light px-5 py-4">
-            <p class="text-sm text-brand-deep dark:text-brand-glow">Ninguém tem a resposta definitiva. Mas quem aprende
-              a trabalhar <span class="font-semibold">com</span> a IA, em vez de competir contra ela, tende a sair na
-              frente — seja qual for a profissão.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE — MATERIAIS DE APOIO -->
-    <!-- ============================================================ -->
-    <section class="slide" data-index="15">
-      <div class="slide-inner flex flex-col justify-center px-6 py-16 sm:px-14 md:px-24">
-        <div class="max-w-5xl mx-auto w-full">
-          <span class="module-tag bg-brand-light text-brand">Para levar com você</span>
-          <h2 class="slide-title text-3xl sm:text-5xl mb-4">Materiais de Apoio</h2>
-          <p class="text-base sm:text-lg text-ink/65 leading-relaxed mb-8 max-w-2xl">
-            Três documentos para levar com você e continuar praticando depois da oficina.
-          </p>
-
-          <div class="grid sm:grid-cols-3 gap-4 mb-6">
-            <div class="tool-card" style="border-top:3px solid #4B3F72;">
-              <p class="text-2xl mb-2" aria-hidden="true">&#128196;</p>
-              <p class="font-display font-semibold text-base mb-1">Prompts para Currículo e Entrevista de Estágio</p>
-              <p class="text-sm text-ink/65 leading-relaxed">Modelos prontos para montar currículo, carta de
-                apresentação e treinar respostas de entrevista.</p>
-            </div>
-            <div class="tool-card" style="border-top:3px solid #1B998B;">
-              <p class="text-2xl mb-2" aria-hidden="true">&#128218;</p>
-              <p class="font-display font-semibold text-base mb-1">Prompts para Estudar e Revisar Matéria</p>
-              <p class="text-sm text-ink/65 leading-relaxed">Modelos para gerar resumos, questões de simulado e
-                explicações sob medida para cada matéria.</p>
-            </div>
-            <div class="tool-card" style="border-top:3px solid #C9A227;">
-              <p class="text-2xl mb-2" aria-hidden="true">&#129517;</p>
-              <p class="font-display font-semibold text-base mb-1">Guia de Boas Práticas da Engenharia de Prompt</p>
-              <p class="text-sm text-ink/65 leading-relaxed">Um manual rápido com a fórmula P.A.C.F. e as principais
-                dicas para tirar o máximo de qualquer IA.</p>
-            </div>
-          </div>
-
-          <p class="text-sm text-ink/50">Esses materiais serão entregues em formato Word ao final da oficina.</p>
-        </div>
-      </div>
-    </section>
-    <!-- ============================================================ -->
-    <!-- SLIDE 10 — FECHAMENTO -->
-    <!-- ============================================================ -->
-    <section class="slide" data-index="16">
-      <div class="slide-inner flex flex-col items-center justify-center px-6 py-16 sm:px-14 text-center">
-        <div class="max-w-2xl mx-auto w-full">
-          <span class="module-tag bg-brand-light text-brand">Fechamento</span>
-          <h2 class="slide-title text-3xl sm:text-5xl mb-6">Você já sabe o suficiente para começar</h2>
-          <p class="text-ink/65 mb-8 max-w-lg mx-auto leading-relaxed">
-            Da próxima vez que abrir uma IA, lembre-se: persona, ação, contexto e formato. É a diferença entre uma
-            resposta genérica e uma resposta que resolve seu problema de verdade.
-          </p>
-
-          <ul class="text-left space-y-3 mb-10 text-ink/75">
-            <li class="flex gap-3"><span class="text-brand dark:text-brand-glow font-bold">1</span> A IA não é mágica, é
-              padrão.</li>
-            <li class="flex gap-3"><span class="text-signal dark:text-signal-glow font-bold">2</span> Existe a
-              ferramenta certa para cada tarefa.</li>
-            <li class="flex gap-3"><span class="text-warn dark:text-warn-glow font-bold">3</span> Um prompt específico
-              muda tudo.</li>
-            <li class="flex gap-3"><span class="text-gold-deep dark:text-gold-glow font-bold">4</span> A fórmula
-              P.A.C.F. é o seu atalho.</li>
-            <li class="flex gap-3"><span class="text-good dark:text-good-glow font-bold">5</span> A prática é o único
-              caminho — comece hoje.</li>
-          </ul>
-
-          <div
-            class="flex items-center justify-center gap-2 font-mono text-base sm:text-lg text-brand/70 dark:text-brand-glow">
-            <span>&gt;</span>
-            <span id="closingTyped"></span><span class="cursor-blink">▌</span>
-          </div>
-          <p class="text-ink/55 mt-8">Perguntas?</p>
-        </div>
-      </div>
-    </section>
-
-  </div>
+    </div>
+  </main>
 
   <!-- ================================================================ -->
-  <!-- BARRA DE PROGRESSO + NAVEGAÇÃO -->
+  <!-- BARRA DE PROGRESSO                                               -->
   <!-- ================================================================ -->
   <div class="fixed inset-x-0 top-0 h-1.5 bg-brand/10 z-40">
     <div id="progressBar" class="h-full bg-gradient-to-r from-brand to-gold transition-all duration-500"
       style="width: 5.88%;"></div>
   </div>
 
-  <div class="fixed inset-x-0 bottom-0 z-40 flex items-center justify-between px-5 py-4 sm:px-10 sm:py-5">
+  <!-- ================================================================ -->
+  <!-- NAVEGAÇÃO                                                        -->
+  <!-- ================================================================ -->
+  <nav class="nav-bar fixed inset-x-0 bottom-0 z-40 flex items-center justify-between px-5 py-4 sm:px-10 sm:py-5"
+    aria-label="Navegação de slides">
     <button id="prevBtn" class="nav-btn" aria-label="Slide anterior"><span aria-hidden="true">‹</span><span
         class="hidden sm:inline">Anterior</span></button>
-    <span id="slideCounter" class="text-xs sm:text-sm font-semibold text-ink/55 font-mono tabular-nums"
+    <span id="slideCounter" class="slide-counter text-xs sm:text-sm font-semibold text-ink/55 font-mono"
       aria-live="polite">01 / 17</span>
     <button id="nextBtn" class="nav-btn" aria-label="Próximo slide"><span class="hidden sm:inline">Próximo</span><span
         aria-hidden="true">›</span></button>
-  </div>
-
-  <script>
-    (function () {
-      "use strict";
-
-      /* -------------------------------------------------------------- */
-      /* TEMA CLARO / ESCURO                                             */
-      /* -------------------------------------------------------------- */
-      var root = document.documentElement;
-      var themeBtn = document.getElementById("themeToggle");
-      var iconSun = document.getElementById("iconSun");
-      var iconMoon = document.getElementById("iconMoon");
-
-      function setTheme(dark) {
-        root.classList.toggle("dark", dark);
-        if (themeBtn) themeBtn.setAttribute("aria-pressed", String(dark));
-        if (iconSun) iconSun.style.display = dark ? "" : "none";
-        if (iconMoon) iconMoon.style.display = dark ? "none" : "";
-        try { localStorage.setItem("oficina-theme", dark ? "dark" : "light"); } catch (e) { }
-      }
-
-      (function initTheme() {
-        var stored = null;
-        try { stored = localStorage.getItem("oficina-theme"); } catch (e) { }
-        var prefersDark = !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
-        setTheme(stored ? stored === "dark" : prefersDark);
-      })();
-
-      if (themeBtn) {
-        themeBtn.addEventListener("click", function () {
-          setTheme(!root.classList.contains("dark"));
-        });
-      }
-
-      var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-      /* -------------------------------------------------------------- */
-      /* NAVEGAÇÃO ENTRE SLIDES                                          */
-      /* -------------------------------------------------------------- */
-      var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
-      var total = slides.length;
-      var current = 0;
-      var closingPlayed = false;
-
-      var counterEl = document.getElementById("slideCounter");
-      var progressEl = document.getElementById("progressBar");
-      var prevBtn = document.getElementById("prevBtn");
-      var nextBtn = document.getElementById("nextBtn");
-
-      function pad(n) { return String(n).padStart(2, "0"); }
-
-      function renderSlides() {
-        slides.forEach(function (s, i) {
-          s.style.transform = "translateX(" + (i - current) * 100 + "%)";
-          s.setAttribute("aria-hidden", i === current ? "false" : "true");
-        });
-        counterEl.textContent = pad(current + 1) + " / " + pad(total);
-        progressEl.style.width = ((current + 1) / total) * 100 + "%";
-        prevBtn.disabled = current === 0;
-        nextBtn.disabled = current === total - 1;
-
-        if (current === total - 1 && !closingPlayed) {
-          closingPlayed = true;
-          playTypewriter(document.getElementById("closingTyped"), "Obrigado(a) por participar!", 40);
-        }
-      }
-
-      function goTo(i) {
-        current = Math.max(0, Math.min(total - 1, i));
-        renderSlides();
-      }
-
-      prevBtn.addEventListener("click", function () { goTo(current - 1); });
-      nextBtn.addEventListener("click", function () { goTo(current + 1); });
-
-      document.addEventListener("keydown", function (e) {
-        var tag = (document.activeElement && document.activeElement.tagName) || "";
-        if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
-
-        if (e.key === "ArrowRight" || e.key === "PageDown") { e.preventDefault(); goTo(current + 1); }
-        else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); goTo(current - 1); }
-        else if (e.key === "Home") { e.preventDefault(); goTo(0); }
-        else if (e.key === "End") { e.preventDefault(); goTo(total - 1); }
-      });
-
-      renderSlides();
-
-      /* -------------------------------------------------------------- */
-      /* MÁQUINA DE ESCREVER (capa + fechamento)                         */
-      /* -------------------------------------------------------------- */
-      function playTypewriter(el, text, speed) {
-        if (!el) return;
-        if (reduceMotion) { el.textContent = text; return; }
-        el.textContent = "";
-        var i = 0;
-        (function step() {
-          if (i <= text.length) {
-            el.textContent = text.slice(0, i);
-            i++;
-            setTimeout(step, speed || 45);
-          }
-        })();
-      }
-      playTypewriter(document.getElementById("coverTyped"), "Aja como um assistente de comunicação corporativa...", 35);
-
-      /* -------------------------------------------------------------- */
-      /* COPIAR PROMPT (com fallback robusto)                            */
-      /* -------------------------------------------------------------- */
-      function fallbackCopy(text, cb) {
-        try {
-          var ta = document.createElement("textarea");
-          ta.value = text;
-          ta.setAttribute("readonly", "");
-          ta.style.position = "fixed";
-          ta.style.top = "-1000px";
-          ta.style.left = "-1000px";
-          document.body.appendChild(ta);
-          ta.focus();
-          ta.select();
-          var ok = document.execCommand("copy");
-          document.body.removeChild(ta);
-          cb(ok);
-        } catch (err) {
-          cb(false);
-        }
-      }
-
-      function copyText(text, btn) {
-        var original = btn.textContent;
-        function finish(ok) {
-          btn.textContent = ok ? "Copiado!" : "Não foi possível";
-          btn.classList.add(ok ? "copy-success" : "copy-fail");
-          setTimeout(function () {
-            btn.textContent = original;
-            btn.classList.remove("copy-success", "copy-fail");
-          }, 1700);
-        }
-        if (navigator.clipboard && window.isSecureContext) {
-          navigator.clipboard.writeText(text).then(function () { finish(true); }).catch(function () {
-            fallbackCopy(text, finish);
-          });
-        } else {
-          fallbackCopy(text, finish);
-        }
-      }
-
-      document.addEventListener("click", function (e) {
-        var btn = e.target.closest ? e.target.closest(".copy-btn") : null;
-        if (!btn) return;
-        var target = document.getElementById(btn.dataset.target);
-        if (!target) return;
-        copyText(target.textContent.trim(), btn);
-      });
-
-      /* -------------------------------------------------------------- */
-      /* REVELAR RESPOSTA SIMULADA                                       */
-      /* -------------------------------------------------------------- */
-      document.addEventListener("click", function (e) {
-        var btn = e.target.closest ? e.target.closest(".reveal-btn") : null;
-        if (!btn) return;
-        var panel = document.getElementById(btn.dataset.reveal);
-        if (!panel) return;
-        var willShow = panel.classList.contains("hidden");
-        panel.classList.toggle("hidden");
-        btn.textContent = willShow ? "Ocultar resposta simulada" : "Ver resposta simulada";
-        btn.setAttribute("aria-expanded", String(willShow));
-      });
-
-      /* -------------------------------------------------------------- */
-      /* FILTRO DE FERRAMENTAS                                           */
-      /* -------------------------------------------------------------- */
-      document.addEventListener("click", function (e) {
-        var btn = e.target.closest ? e.target.closest("#toolFilters .filter-btn") : null;
-        if (!btn) return;
-        document.querySelectorAll("#toolFilters .filter-btn").forEach(function (b) { b.classList.remove("is-active"); });
-        btn.classList.add("is-active");
-        var f = btn.dataset.filter;
-        document.querySelectorAll(".tool-card").forEach(function (card) {
-          card.style.display = card.dataset.cat === f ? "" : "none";
-        });
-      });
-
-      /* -------------------------------------------------------------- */
-      /* SOUVENIR — TROCA DE ESTILO DA IMAGEM                            */
-      /* -------------------------------------------------------------- */
-      function renderSouvenirPrompt(style) {
-        var el = document.getElementById("p3-imagem");
-        if (!el) return;
-        el.textContent = "Crie uma ilustração digital, em estilo " + style + ", representando um(a) [minha profissão] confiante e realizado(a) no futuro. Use tons de azul e dourado, com uma composição inspiradora e positiva.";
-      }
-      var styleChips = document.getElementById("styleChips");
-      if (styleChips) {
-        styleChips.addEventListener("click", function (e) {
-          var btn = e.target.closest ? e.target.closest(".filter-btn") : null;
-          if (!btn) return;
-          styleChips.querySelectorAll(".filter-btn").forEach(function (b) { b.classList.remove("is-active"); });
-          btn.classList.add("is-active");
-          renderSouvenirPrompt(btn.dataset.style);
-        });
-        renderSouvenirPrompt("aquarela");
-      }
-
-      /* -------------------------------------------------------------- */
-      /* CONSTRUTOR DE PROMPT (P.A.C.F.)                                 */
-      /* -------------------------------------------------------------- */
-      var bPersona = document.getElementById("bPersona");
-      var bAcao = document.getElementById("bAcao");
-      var bContexto = document.getElementById("bContexto");
-      var bFormato = document.getElementById("bFormato");
-      var builderOutput = document.getElementById("builderOutput");
-
-      function buildPrompt() {
-        if (!builderOutput) return;
-        var persona = (bPersona.value || "").trim() || "[persona]";
-        var acao = (bAcao.value || "").trim() || "[ação]";
-        var contexto = (bContexto.value || "").trim() || "[contexto]";
-        var formato = (bFormato.value || "").trim() || "[formato]";
-        builderOutput.textContent = "Aja como " + persona + ". " + acao + " para " + contexto + ". Apresente no formato de " + formato + ".";
-      }
-      [bPersona, bAcao, bContexto, bFormato].forEach(function (input) {
-        if (input) input.addEventListener("input", buildPrompt);
-      });
-      buildPrompt();
-
-      /* -------------------------------------------------------------- */
-      /* CRONÔMETRO DA DINÂMICA                                          */
-      /* -------------------------------------------------------------- */
-      var timerDisplay = document.getElementById("timerDisplay");
-      var timerFill = document.getElementById("timerFill");
-      var timerStart = document.getElementById("timerStart");
-      var timerPause = document.getElementById("timerPause");
-      var timerReset = document.getElementById("timerReset");
-      var timerPresetsWrap = document.getElementById("timerPresets");
-
-      if (timerDisplay && timerStart) {
-        var totalSeconds = 15 * 60;
-        var remaining = totalSeconds;
-        var intervalId = null;
-
-        function formatTime(s) {
-          var m = Math.floor(s / 60);
-          var sec = s % 60;
-          return pad(m) + ":" + pad(sec);
-        }
-
-        function updateTimerUI() {
-          timerDisplay.textContent = formatTime(remaining);
-          var urgent = remaining <= 60 && remaining > 0;
-          timerDisplay.classList.toggle("timer-urgent", urgent);
-          timerFill.classList.toggle("is-urgent", urgent);
-          timerFill.style.width = (remaining / totalSeconds) * 100 + "%";
-          timerStart.disabled = !!intervalId || remaining <= 0;
-          timerPause.disabled = !intervalId;
-        }
-
-        function tick() {
-          remaining = Math.max(0, remaining - 1);
-          updateTimerUI();
-          if (remaining <= 0) {
-            clearInterval(intervalId);
-            intervalId = null;
-            updateTimerUI();
-          }
-        }
-
-        timerStart.addEventListener("click", function () {
-          if (intervalId || remaining <= 0) return;
-          intervalId = setInterval(tick, 1000);
-          updateTimerUI();
-        });
-        timerPause.addEventListener("click", function () {
-          if (intervalId) { clearInterval(intervalId); intervalId = null; }
-          updateTimerUI();
-        });
-        timerReset.addEventListener("click", function () {
-          if (intervalId) { clearInterval(intervalId); intervalId = null; }
-          remaining = totalSeconds;
-          updateTimerUI();
-        });
-        if (timerPresetsWrap) {
-          timerPresetsWrap.addEventListener("click", function (e) {
-            var btn = e.target.closest ? e.target.closest(".timer-preset") : null;
-            if (!btn) return;
-            if (intervalId) { clearInterval(intervalId); intervalId = null; }
-            document.querySelectorAll(".timer-preset").forEach(function (b) { b.classList.remove("is-active"); });
-            btn.classList.add("is-active");
-            totalSeconds = Number(btn.dataset.mins) * 60;
-            remaining = totalSeconds;
-            updateTimerUI();
-          });
-        }
-
-        updateTimerUI();
-      }
-
-      /* -------------------------------------------------------------- */
-      /* DESAFIO-RELÂMPAGO — PLACAR AO VIVO                              */
-      /* -------------------------------------------------------------- */
-      var teams = [];
-      var teamSeq = 0;
-      var scoreboardList = document.getElementById("scoreboardList");
-      var scoreboardEmpty = document.getElementById("scoreboardEmpty");
-      var teamNameInput = document.getElementById("teamNameInput");
-      var addTeamBtn = document.getElementById("addTeamBtn");
-      var resetScoreboardBtn = document.getElementById("resetScoreboard");
-
-      function escapeHtml(s) {
-        return String(s).replace(/[&<>"']/g, function (c) {
-          return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
-        });
-      }
-
-      function renderScoreboard() {
-        if (!scoreboardList) return;
-        if (scoreboardEmpty) scoreboardEmpty.style.display = teams.length ? "none" : "";
-        var sorted = teams.slice().sort(function (a, b) { return b.score - a.score; });
-        scoreboardList.innerHTML = sorted.map(function (t, i) {
-          return '<div class="score-row">' +
-            '<span class="score-rank">' + (i + 1) + '</span>' +
-            '<span class="score-name">' + escapeHtml(t.name) + '</span>' +
-            '<span class="score-value">' + t.score + '</span>' +
-            '<button class="score-btn" data-action="minus" data-id="' + t.id + '" aria-label="Tirar ponto de ' + escapeHtml(t.name) + '">\u2212</button>' +
-            '<button class="score-btn" data-action="plus" data-id="' + t.id + '" aria-label="Somar ponto para ' + escapeHtml(t.name) + '">+</button>' +
-            '<button class="score-btn score-remove" data-action="remove" data-id="' + t.id + '" aria-label="Remover ' + escapeHtml(t.name) + '">\u00d7</button>' +
-            '</div>';
-        }).join("");
-      }
-
-      if (addTeamBtn && teamNameInput) {
-        addTeamBtn.addEventListener("click", function () {
-          var name = (teamNameInput.value || "").trim();
-          if (!name) { teamNameInput.focus(); return; }
-          teamSeq++;
-          teams.push({ id: teamSeq, name: name, score: 0 });
-          teamNameInput.value = "";
-          renderScoreboard();
-          teamNameInput.focus();
-        });
-        teamNameInput.addEventListener("keydown", function (e) {
-          if (e.key === "Enter") { e.preventDefault(); addTeamBtn.click(); }
-        });
-      }
-
-      if (scoreboardList) {
-        scoreboardList.addEventListener("click", function (e) {
-          var btn = e.target.closest ? e.target.closest(".score-btn") : null;
-          if (!btn) return;
-          var id = Number(btn.dataset.id);
-          var action = btn.dataset.action;
-          var team = null;
-          for (var i = 0; i < teams.length; i++) { if (teams[i].id === id) { team = teams[i]; break; } }
-          if (!team) return;
-          if (action === "plus") team.score++;
-          else if (action === "minus") team.score = Math.max(0, team.score - 1);
-          else if (action === "remove") teams = teams.filter(function (t) { return t.id !== id; });
-          renderScoreboard();
-        });
-      }
-
-      if (resetScoreboardBtn) {
-        resetScoreboardBtn.addEventListener("click", function () {
-          teams = [];
-          renderScoreboard();
-        });
-      }
-
-      renderScoreboard();
-
-      var challenges = [
-        "Crie um prompt para planejar uma festa de aniversário surpresa.",
-        "Crie um prompt para montar uma legenda de Instagram para o primeiro dia de trabalho.",
-        "Crie um prompt para explicar uma matéria difícil da escola para uma criança de 8 anos.",
-        "Crie um prompt para montar um cardápio de lanche saudável e barato.",
-        "Crie um prompt para escrever uma mensagem pedindo um ajuste de horário no trabalho de meio período.",
-        "Crie um prompt para montar um roteiro de vídeo de 30 segundos sobre um hobby seu.",
-        "Crie um prompt para organizar um cronograma de estudos para a prova da semana.",
-        "Crie um prompt para escrever um pedido de desculpas educado por um atraso no trabalho."
-      ];
-      var drawChallengeBtn = document.getElementById("drawChallenge");
-      var challengeTextEl = document.getElementById("challengeText");
-      if (drawChallengeBtn && challengeTextEl) {
-        drawChallengeBtn.addEventListener("click", function () {
-          var pick = challenges[Math.floor(Math.random() * challenges.length)];
-          challengeTextEl.textContent = pick;
-        });
-      }
-
-    })();
-  </script>
+  </nav>
 
 </body>
 
