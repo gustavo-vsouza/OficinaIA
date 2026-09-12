@@ -383,28 +383,6 @@ body {
 }
 
 /* ======================================= */
-/* STYLE CHIP (souvenir styles)            */
-/* ======================================= */
-.style-chip {
-  font-family: 'Inter', sans-serif;
-  font-weight: 600;
-  font-size: 0.85rem;
-  padding: 0.55rem 1.1rem;
-  border-radius: 999px;
-  border: 1px solid var(--c-line);
-  background: var(--c-surface);
-  color: rgb(var(--c-ink-rgb) / .62);
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.style-chip.is-active {
-  background: #4B3F72;
-  border-color: #4B3F72;
-  color: #fff;
-}
-
-/* ======================================= */
 /* TOOL CARD                               */
 /* ======================================= */
 .tool-card {
@@ -457,25 +435,6 @@ body {
 /* ======================================= */
 /* TIMER                                   */
 /* ======================================= */
-.timer-display {
-  font-family: 'Space Grotesk', sans-serif;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
-}
-
-#timerDisplay.timer-urgent {
-  color: #C0392B !important;
-}
-
-.dark #timerDisplay.timer-urgent {
-  color: #F3A79D !important;
-}
-
-#timerDisplay.timer-finished {
-  animation: timerPulse 0.6s ease-in-out 3;
-}
-
 @keyframes timerPulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.3; }
@@ -549,6 +508,168 @@ body {
   background: #332953;
   border-color: #332953;
   color: #fff;
+}
+
+/* ======================================= */
+/* CRONÔMETRO FLUTUANTE                    */
+/* ======================================= */
+.floating-timer {
+  position: fixed;
+  right: 1rem;
+  bottom: 5.75rem;
+  z-index: 45;
+  width: 14.5rem;
+  max-width: calc(100vw - 2rem);
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  border-radius: 1rem;
+  box-shadow: 0 10px 28px rgba(33, 28, 46, .14);
+  opacity: 0;
+  transform: translateY(14px) scale(.96);
+  pointer-events: none;
+  transition: opacity .25s ease, transform .25s ease;
+}
+
+.dark .floating-timer {
+  box-shadow: 0 10px 28px rgba(0, 0, 0, .4);
+}
+
+.floating-timer.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.floating-timer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.6rem 0.85rem;
+  border-bottom: 1px solid var(--c-line);
+}
+
+.floating-timer-label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: rgb(var(--c-ink-rgb) / .8);
+}
+
+.floating-timer-toggle {
+  width: 1.6rem;
+  height: 1.6rem;
+  flex-shrink: 0;
+  border-radius: 999px;
+  border: 1px solid var(--c-line);
+  background: var(--c-surface);
+  color: rgb(var(--c-ink-rgb) / .6);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform .15s ease;
+}
+
+.floating-timer-toggle:hover {
+  transform: translateY(-1px);
+}
+
+.floating-timer-body {
+  padding: 0.85rem 0.9rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.floating-timer.is-collapsed .floating-timer-body {
+  display: none;
+}
+
+.floating-timer-display {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 1.85rem;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: rgb(var(--c-ink-rgb));
+}
+
+#floatingTimerDisplay.timer-urgent {
+  color: #C0392B !important;
+}
+
+.dark #floatingTimerDisplay.timer-urgent {
+  color: #F3A79D !important;
+}
+
+#floatingTimerDisplay.timer-finished {
+  animation: timerPulse 0.6s ease-in-out 3;
+}
+
+.floating-timer-track {
+  width: 100%;
+}
+
+.floating-timer-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.floating-timer-input {
+  width: 4rem;
+  text-align: center;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  padding: 0.35rem 0.4rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--c-line);
+  background: var(--c-input);
+  color: rgb(var(--c-ink-rgb));
+  outline: none;
+}
+
+.floating-timer-input:focus {
+  border-color: #4B3F72;
+}
+
+.dark .floating-timer-input:focus {
+  border-color: #8F80C9;
+}
+
+.floating-timer-unit {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.78rem;
+  color: rgb(var(--c-ink-rgb) / .5);
+}
+
+.floating-timer-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.floating-timer-actions .timer-ctrl {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.78rem;
+}
+
+@media (max-width: 640px) {
+  .floating-timer {
+    width: 12rem;
+    right: 0.75rem;
+    bottom: 5.5rem;
+  }
+
+  .floating-timer-display {
+    font-size: 1.5rem;
+  }
 }
 
 /* ======================================= */
@@ -732,7 +853,11 @@ body {
     transition: none !important;
   }
 
-  #timerDisplay.timer-finished {
+  #floatingTimerDisplay.timer-finished {
     animation: none !important;
+  }
+
+  .floating-timer {
+    transition: none !important;
   }
 }

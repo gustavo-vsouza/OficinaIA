@@ -39,6 +39,7 @@
   var total = slides.length;
   var current = 0;
   var closingPlayed = false;
+  var onSlideChange = null;
 
   var counterEl = document.getElementById("slideCounter");
   var progressEl = document.getElementById("progressBar");
@@ -69,6 +70,8 @@
       closingPlayed = true;
       playTypewriter(document.getElementById("closingTyped"), "Obrigado(a) por participar!", 40);
     }
+
+    if (typeof onSlideChange === "function") onSlideChange(current);
   }
 
   function goTo(i) {
@@ -188,26 +191,6 @@
   });
 
   /* -------------------------------------------------------------- */
-  /* SOUVENIR — TROCA DE ESTILO DA IMAGEM                            */
-  /* -------------------------------------------------------------- */
-  function renderSouvenirPrompt(style) {
-    var el = document.getElementById("p3-imagem");
-    if (!el) return;
-    el.textContent = "Crie uma ilustração digital, em estilo " + style + ", representando um(a) [minha profissão] confiante e realizado(a) no futuro. Use tons de azul e dourado, com uma composição inspiradora e positiva.";
-  }
-  var styleChips = document.getElementById("styleChips");
-  if (styleChips) {
-    styleChips.addEventListener("click", function (e) {
-      var btn = e.target.closest ? e.target.closest(".style-chip") : null;
-      if (!btn) return;
-      styleChips.querySelectorAll(".style-chip").forEach(function (b) { b.classList.remove("is-active"); });
-      btn.classList.add("is-active");
-      renderSouvenirPrompt(btn.dataset.style);
-    });
-    renderSouvenirPrompt("aquarela");
-  }
-
-  /* -------------------------------------------------------------- */
   /* CONSTRUTOR DE PROMPT (P.A.C.F.)                                 */
   /* -------------------------------------------------------------- */
   var bPersona = document.getElementById("bPersona");
@@ -230,85 +213,130 @@
   buildPrompt();
 
   /* -------------------------------------------------------------- */
-  /* CRONÔMETRO DA DINÂMICA                                          */
+  /* CRONÔMETRO FLUTUANTE (Desafio-relâmpago)                        */
   /* -------------------------------------------------------------- */
-  var timerDisplay = document.getElementById("timerDisplay");
-  var timerFill = document.getElementById("timerFill");
-  var timerStart = document.getElementById("timerStart");
-  var timerPause = document.getElementById("timerPause");
-  var timerReset = document.getElementById("timerReset");
-  var timerPresetsWrap = document.getElementById("timerPresets");
+  var CHALLENGE_SLIDE_INDEX = 9; /* slide "Desafio-relâmpago" */
+  var floatingTimer = document.getElementById("floatingTimer");
+  var floatingTimerDisplay = document.getElementById("floatingTimerDisplay");
+  var floatingTimerFill = document.getElementById("floatingTimerFill");
+  var floatingTimerMinutes = document.getElementById("floatingTimerMinutes");
+  var floatingTimerStart = document.getElementById("floatingTimerStart");
+  var floatingTimerPause = document.getElementById("floatingTimerPause");
+  var floatingTimerReset = document.getElementById("floatingTimerReset");
+  var floatingTimerToggle = document.getElementById("floatingTimerToggle");
 
-  if (timerDisplay && timerStart) {
-    var totalSeconds = 15 * 60;
-    var remaining = totalSeconds;
-    var intervalId = null;
+  if (floatingTimer && floatingTimerDisplay) {
+    var ftTotalSeconds = 15 * 60;
+    var ftRemaining = ftTotalSeconds;
+    var ftIntervalId = null;
+    var audioCtx = null;
 
-    function formatTime(s) {
+    function ftFormat(s) {
       var m = Math.floor(s / 60);
       var sec = s % 60;
       return pad(m) + ":" + pad(sec);
     }
 
-    function updateTimerUI() {
-      var finished = remaining <= 0 && totalSeconds > 0;
-      var urgent = remaining <= 60 && remaining > 0;
+    /* Bipe curto via Web Audio API — não depende de nenhum arquivo externo */
+    function playFinishSound() {
+      try {
+        var Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return;
+        if (!audioCtx) audioCtx = new Ctx();
+        var now = audioCtx.currentTime;
+        [0, 0.32, 0.64].forEach(function (offset) {
+          var osc = audioCtx.createOscillator();
+          var gain = audioCtx.createGain();
+          osc.type = "sine";
+          osc.frequency.value = 880;
+          gain.gain.setValueAtTime(0.0001, now + offset);
+          gain.gain.exponentialRampToValueAtTime(0.35, now + offset + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + offset + 0.28);
+          osc.connect(gain).connect(audioCtx.destination);
+          osc.start(now + offset);
+          osc.stop(now + offset + 0.3);
+        });
+      } catch (e) { /* se o navegador bloquear áudio, segue sem som */ }
+    }
 
-      timerDisplay.classList.toggle("timer-urgent", urgent);
-      timerFill.classList.toggle("is-urgent", urgent);
-      timerFill.style.width = (remaining / totalSeconds) * 100 + "%";
-      timerStart.disabled = !!intervalId || remaining <= 0;
-      timerPause.disabled = !intervalId;
+    function ftUpdateUI() {
+      var finished = ftRemaining <= 0 && ftTotalSeconds > 0;
+      var urgent = ftRemaining <= 60 && ftRemaining > 0;
 
-      /* Visual feedback when timer reaches zero */
+      floatingTimerDisplay.classList.toggle("timer-urgent", urgent);
+      floatingTimerFill.classList.toggle("is-urgent", urgent);
+      floatingTimerFill.style.width = (ftRemaining / ftTotalSeconds) * 100 + "%";
+      floatingTimerStart.disabled = !!ftIntervalId || ftRemaining <= 0;
+      floatingTimerPause.disabled = !ftIntervalId;
+      floatingTimerMinutes.disabled = !!ftIntervalId;
+
       if (finished) {
-        timerDisplay.textContent = "Tempo!";
-        timerDisplay.classList.remove("timer-urgent");
-        timerDisplay.classList.add("timer-finished");
+        floatingTimerDisplay.textContent = "Tempo!";
+        floatingTimerDisplay.classList.remove("timer-urgent");
+        floatingTimerDisplay.classList.add("timer-finished");
       } else {
-        timerDisplay.textContent = formatTime(remaining);
-        timerDisplay.classList.remove("timer-finished");
+        floatingTimerDisplay.textContent = ftFormat(ftRemaining);
+        floatingTimerDisplay.classList.remove("timer-finished");
       }
     }
 
-    function tick() {
-      remaining = Math.max(0, remaining - 1);
-      updateTimerUI();
-      if (remaining <= 0) {
-        clearInterval(intervalId);
-        intervalId = null;
-        updateTimerUI();
+    function ftTick() {
+      ftRemaining = Math.max(0, ftRemaining - 1);
+      ftUpdateUI();
+      if (ftRemaining <= 0) {
+        clearInterval(ftIntervalId);
+        ftIntervalId = null;
+        ftUpdateUI();
+        playFinishSound();
       }
     }
 
-    timerStart.addEventListener("click", function () {
-      if (intervalId || remaining <= 0) return;
-      intervalId = setInterval(tick, 1000);
-      updateTimerUI();
+    floatingTimerStart.addEventListener("click", function () {
+      if (ftIntervalId || ftRemaining <= 0) return;
+      /* AudioContext precisa ser criado/retomado num gesto do usuário */
+      try {
+        var Ctx = window.AudioContext || window.webkitAudioContext;
+        if (Ctx && !audioCtx) audioCtx = new Ctx();
+        if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+      } catch (e) { }
+      ftIntervalId = setInterval(ftTick, 1000);
+      ftUpdateUI();
     });
-    timerPause.addEventListener("click", function () {
-      if (intervalId) { clearInterval(intervalId); intervalId = null; }
-      updateTimerUI();
+    floatingTimerPause.addEventListener("click", function () {
+      if (ftIntervalId) { clearInterval(ftIntervalId); ftIntervalId = null; }
+      ftUpdateUI();
     });
-    timerReset.addEventListener("click", function () {
-      if (intervalId) { clearInterval(intervalId); intervalId = null; }
-      remaining = totalSeconds;
-      updateTimerUI();
+    floatingTimerReset.addEventListener("click", function () {
+      if (ftIntervalId) { clearInterval(ftIntervalId); ftIntervalId = null; }
+      ftRemaining = ftTotalSeconds;
+      ftUpdateUI();
     });
-    if (timerPresetsWrap) {
-      timerPresetsWrap.addEventListener("click", function (e) {
-        var btn = e.target.closest ? e.target.closest(".timer-preset") : null;
-        if (!btn) return;
-        if (intervalId) { clearInterval(intervalId); intervalId = null; }
-        document.querySelectorAll(".timer-preset").forEach(function (b) { b.classList.remove("is-active"); });
-        btn.classList.add("is-active");
-        totalSeconds = Number(btn.dataset.mins) * 60;
-        remaining = totalSeconds;
-        updateTimerUI();
+    floatingTimerMinutes.addEventListener("change", function () {
+      if (ftIntervalId) return;
+      var mins = Math.min(90, Math.max(1, Math.round(Number(floatingTimerMinutes.value) || 15)));
+      floatingTimerMinutes.value = mins;
+      ftTotalSeconds = mins * 60;
+      ftRemaining = ftTotalSeconds;
+      ftUpdateUI();
+    });
+    if (floatingTimerToggle) {
+      floatingTimerToggle.addEventListener("click", function () {
+        var collapsed = floatingTimer.classList.toggle("is-collapsed");
+        floatingTimerToggle.textContent = collapsed ? "+" : "–";
+        floatingTimerToggle.setAttribute("aria-label", collapsed ? "Expandir cronômetro" : "Minimizar cronômetro");
+        floatingTimerToggle.setAttribute("aria-expanded", String(!collapsed));
       });
     }
 
-    updateTimerUI();
+    ftUpdateUI();
+
+    /* Mostra o cronômetro flutuante somente durante o Desafio-relâmpago */
+    onSlideChange = function (index) {
+      var show = index === CHALLENGE_SLIDE_INDEX;
+      floatingTimer.classList.toggle("is-visible", show);
+      floatingTimer.setAttribute("aria-hidden", String(!show));
+    };
+    onSlideChange(current);
   }
 
   /* -------------------------------------------------------------- */
