@@ -141,7 +141,6 @@ body {
   line-height: 1.65;
   color: rgb(var(--c-ink-rgb));
   padding: 0.95rem 1.1rem 1.15rem;
-  white-space: pre-wrap;
 }
 
 .prompt-text.is-quoted::before {
@@ -240,7 +239,6 @@ body {
   line-height: 1.6;
   color: rgb(var(--c-ink-rgb) / .82);
   margin-top: 0.6rem;
-  white-space: pre-wrap;
 }
 
 .reveal-panel.hidden {
